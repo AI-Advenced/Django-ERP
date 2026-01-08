@@ -419,6 +419,15 @@ CSRF_COOKIE_SECURE=False
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+
+Or
+python manage.py makemigrations name model
+python manage.py migrate name model
+do for all models
+
+Exemple :
+python manage.py makemigrations crm
+python manage.py migrate crm
 ```
 
 #### 7. Create Superuser
