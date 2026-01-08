@@ -1,0 +1,38 @@
+{%extends 'base.html'%}
+{%block title%}Purchase Orders{%endblock%}
+{%block content%}
+<div class="page-header">
+    <h1><i class="fas fa-file-invoice-dollar"></i> Purchase Orders</h1>
+    <div class="actions">
+        <a href="{%url 'purchasing:purchase_order_create'%}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Purchase Order
+        </a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        {%if object_list%}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tbody>
+                    {%for obj in object_list%}
+                    <tr>
+                        <td><a href="{%url 'purchasing:purchase_order_detail' obj.pk%}">{{obj}}</a></td>
+                        <td class="table-actions">
+                            <a href="{%url 'purchasing:purchase_order_update' obj.pk%}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                            <a href="{%url 'purchasing:purchase_order_delete' obj.pk%}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+        {%else%}
+        <div class="text-center py-5">
+            <p>No purchase orders found</p>
+            <a href="{%url 'purchasing:purchase_order_create'%}" class="btn btn-primary">Add First Purchase Order</a>
+        </div>
+        {%endif%}
+    </div>
+</div>
+{%endblock%}

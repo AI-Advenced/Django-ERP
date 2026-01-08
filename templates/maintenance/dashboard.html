@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance & Asset Management Dashboard - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="fas fa-tools me-3" style="color: var(--primary-color);"></i>
+                Maintenance & Asset Management Dashboard
+            </h1>
+            <p class="text-muted">Monitor assets, maintenance schedules, and work orders</p>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon me-3">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Assets</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_assets }}</h2>
+                            <small class="text-success">Operational: {{ operational_assets }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon success me-3">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Availability</h6>
+                            <h2 class="mb-0 fw-bold">{{ availability_rate|floatformat:1 }}%</h2>
+                            <small class="text-muted">Asset availability rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon warning me-3">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">PM Scheduled</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_pm }}</h2>
+                            <small class="text-danger">Overdue: {{ overdue_pm }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stats-card info">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon info me-3">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Open Work Orders</h6>
+                            <h2 class="mb-0 fw-bold">{{ open_wo }}</h2>
+                            <small class="text-danger">Overdue: {{ overdue_wo }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Work Orders & Upcoming PM -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Recent Work Orders
+                    </h5>
+                    <a href="{% url 'maintenance:workorder_list' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>WO #</th>
+                                    <th>Title</th>
+                                    <th>Asset</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for wo in recent_work_orders %}
+                                <tr>
+                                    <td><a href="{% url 'maintenance:workorder_detail' wo.pk %}">{{ wo.wo_number }}</a></td>
+                                    <td>{{ wo.title|truncatewords:5 }}</td>
+                                    <td>{{ wo.asset.asset_number }}</td>
+                                    <td>
+                                        {% if wo.status == 'completed' %}
+                                        <span class="badge bg-success">{{ wo.get_status_display }}</span>
+                                        {% elif wo.status == 'in_progress' %}
+                                        <span class="badge bg-warning">{{ wo.get_status_display }}</span>
+                                        {% else %}
+                                        <span class="badge bg-info">{{ wo.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if wo.priority == 'emergency' or wo.priority == 'urgent' %}
+                                        <span class="badge bg-danger">{{ wo.get_priority_display }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ wo.get_priority_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted">No work orders found</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Upcoming Preventive Maintenance
+                    </h5>
+                    <a href="{% url 'maintenance:pm_list' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>PM #</th>
+                                    <th>Title</th>
+                                    <th>Asset</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pm in upcoming_pm %}
+                                <tr>
+                                    <td><a href="{% url 'maintenance:pm_detail' pm.pk %}">{{ pm.pm_number }}</a></td>
+                                    <td>{{ pm.title|truncatewords:5 }}</td>
+                                    <td>{{ pm.asset.asset_number }}</td>
+                                    <td>{{ pm.next_due_date }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted">No upcoming PM found</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{% url 'maintenance:asset_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Asset
+                        </a>
+                        <a href="{% url 'maintenance:workorder_create' %}" class="btn btn-warning">
+                            <i class="fas fa-clipboard-list me-2"></i>Create Work Order
+                        </a>
+                        <a href="{% url 'maintenance:pm_create' %}" class="btn btn-info">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule PM
+                        </a>
+                        <a href="{% url 'maintenance:log_create' %}" class="btn btn-secondary">
+                            <i class="fas fa-history me-2"></i>Add Log Entry
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

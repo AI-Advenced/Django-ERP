@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-folder-open me-2"></i>{{ project.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'projects:project_list' %}">Projects</a></li>
+                    <li class="breadcrumb-item active">{{ project.code }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'projects:project_update' project.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'projects:project_delete' project.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Project Info -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-info-circle me-2"></i>Project Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Code:</strong> {{ project.code }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Status:</strong>
+                        <span class="badge bg-{% if project.status == 'completed' %}success{% elif project.status == 'in_progress' %}primary{% else %}secondary{% endif %}">
+                            {{ project.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Priority:</strong>
+                        <span class="badge bg-{% if project.priority == 'critical' %}danger{% elif project.priority == 'high' %}warning{% else %}info{% endif %}">
+                            {{ project.get_priority_display }}
+                        </span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Progress:</strong>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ project.progress }}%">
+                                {{ project.progress }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Manager:</strong> {{ project.manager.username }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Start Date:</strong> {{ project.start_date|date:"M d, Y" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>End Date:</strong> {{ project.end_date|date:"M d, Y" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Budget:</strong> ${{ project.estimated_budget }}
+                    </div>
+                </div>
+                {% if project.description %}
+                <div class="mt-3">
+                    <strong>Description:</strong>
+                    <p>{{ project.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tasks me-2"></i>Tasks</span>
+                <a href="{% url 'projects:task_create' %}?project={{ project.pk }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> New Task
+                </a>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Assigned To</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>{{ task.assigned_to.username|default:"Unassigned" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}primary{% else %}secondary{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ task.due_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'projects:task_detail' task.pk %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted py-3">No tasks yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Milestones -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-flag-checkered me-2"></i>Milestones
+            </div>
+            <div class="card-body">
+                {% if milestones %}
+                    {% for milestone in milestones %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <h6>{{ milestone.name }}</h6>
+                        <small class="text-muted">Due: {{ milestone.due_date|date:"M d, Y" }}</small>
+                        <span class="badge bg-{{ milestone.status }}">{{ milestone.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No milestones.</p>
+                {% endif %}
+                <a href="{% url 'projects:milestone_create' %}?project={{ project.pk }}" class="btn btn-sm btn-primary w-100">
+                    <i class="fas fa-plus me-2"></i>Add Milestone
+                </a>
+            </div>
+        </div>
+
+        <!-- Team Members -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-users me-2"></i>Team Members
+            </div>
+            <div class="card-body">
+                {% if team_members %}
+                    <ul class="list-unstyled">
+                        {% for member in team_members %}
+                        <li class="mb-2">
+                            <i class="fas fa-user me-2"></i>{{ member.username }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">No team members.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

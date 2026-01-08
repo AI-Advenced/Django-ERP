@@ -1,0 +1,154 @@
+{%extends 'base.html'%}
+{%block title%}Preventive Maintenance List - ERP System{%endblock%}
+
+{%block content%}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="fas fa-calendar-check me-3" style="color: var(--primary-color);"></i>
+                Preventive Maintenances
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {%if 'pm' != 'log'%}
+            <a href="{%url 'maintenance:pm_create'%}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add New
+            </a>
+            {%else%}
+            <a href="{%url 'maintenance:log_create'%}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Log Entry
+            </a>
+            {%endif%}
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="operational">Operational</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- List Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title/Name</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%if 'pm' == 'asset'%}
+                        {%for item in assets%}
+                        <tr>
+                            <td><a href="{%url 'maintenance:asset_detail' item.pk%}">{{item.asset_number}}</a></td>
+                            <td>{{item.name}}</td>
+                            <td><span class="badge bg-primary">{{item.get_status_display}}</span></td>
+                            <td>{{item.created_at|date:"Y-m-d"}}</td>
+                            <td>
+                                <a href="{%url 'maintenance:asset_detail' item.pk%}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{%url 'maintenance:asset_update' item.pk%}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{%url 'maintenance:asset_delete' item.pk%}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {%empty%}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No assets found</td></tr>
+                        {%endfor%}
+                        {%elif 'pm' == 'pm'%}
+                        {%for item in pms%}
+                        <tr>
+                            <td><a href="{%url 'maintenance:pm_detail' item.pk%}">{{item.pm_number}}</a></td>
+                            <td>{{item.title}}</td>
+                            <td><span class="badge bg-info">{{item.get_status_display}}</span></td>
+                            <td>{{item.next_due_date}}</td>
+                            <td>
+                                <a href="{%url 'maintenance:pm_detail' item.pk%}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{%url 'maintenance:pm_update' item.pk%}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{%url 'maintenance:pm_delete' item.pk%}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {%empty%}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No PM schedules found</td></tr>
+                        {%endfor%}
+                        {%elif 'pm' == 'workorder'%}
+                        {%for item in work_orders%}
+                        <tr>
+                            <td><a href="{%url 'maintenance:workorder_detail' item.pk%}">{{item.wo_number}}</a></td>
+                            <td>{{item.title}}</td>
+                            <td><span class="badge bg-warning">{{item.get_status_display}}</span></td>
+                            <td>{{item.requested_date}}</td>
+                            <td>
+                                <a href="{%url 'maintenance:workorder_detail' item.pk%}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{%url 'maintenance:workorder_update' item.pk%}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{%url 'maintenance:workorder_delete' item.pk%}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {%empty%}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No work orders found</td></tr>
+                        {%endfor%}
+                        {%else%}
+                        {%for item in logs%}
+                        <tr>
+                            <td>{{item.asset.asset_number}}</td>
+                            <td>{{item.title}}</td>
+                            <td><span class="badge bg-secondary">{{item.get_log_type_display}}</span></td>
+                            <td>{{item.date}}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {%empty%}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No logs found</td></tr>
+                        {%endfor%}
+                        {%endif%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

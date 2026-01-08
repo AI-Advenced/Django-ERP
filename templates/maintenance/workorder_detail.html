@@ -1,0 +1,79 @@
+{%extends 'base.html'%}
+{%block title%}Work Order Details - ERP System{%endblock%}
+
+{%block content%}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="fas fa-clipboard-list me-3" style="color: var(--primary-color);"></i>
+                Work Order Details
+            </h1>
+            {%if 'workorder' == 'asset'%}
+            <p class="text-muted">{{item.asset_number}}</p>
+            {%elif 'workorder' == 'pm'%}
+            <p class="text-muted">{{item.pm_number}}</p>
+            {%else%}
+            <p class="text-muted">{{item.wo_number}}</p>
+            {%endif%}
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{%url 'maintenance:workorder_update' item.pk%}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{%url 'maintenance:workorder_delete' item.pk%}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">Name/Title:</th>
+                            {%if 'workorder' == 'asset'%}
+                            <td>{{item.name}}</td>
+                            {%else%}
+                            <td>{{item.title}}</td>
+                            {%endif%}
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge bg-primary">{{item.get_status_display}}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Created:</th>
+                            <td>{{item.created_at}}</td>
+                        </tr>
+                        <tr>
+                            <th>Updated:</th>
+                            <td>{{item.updated_at}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{%url 'maintenance:workorder_list'%}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Delete Supplier{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-exclamation-triangle text-danger"></i> Confirm Delete</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p class="lead">Are you sure you want to delete supplier: <strong>{{ object.name }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Yes, Delete
+            </button>
+            <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

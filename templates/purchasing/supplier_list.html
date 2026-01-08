@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Suppliers - Purchasing{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-truck"></i> Suppliers</h1>
+    <div class="actions">
+        <a href="{% url 'purchasing:supplier_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Supplier
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search suppliers..." id="searchInput">
+        </div>
+        
+        {% if suppliers %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Orders</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td><strong>{{ supplier.supplier_code }}</strong></td>
+                        <td>
+                            <a href="{% url 'purchasing:supplier_detail' supplier.pk %}" class="text-decoration-none">
+                                {{ supplier.name }}
+                            </a>
+                        </td>
+                        <td>{{ supplier.get_supplier_type_display }}</td>
+                        <td>{{ supplier.email }}</td>
+                        <td><span class="badge status-{{ supplier.status }}">{{ supplier.get_status_display }}</span></td>
+                        <td>{{ supplier.total_orders }}</td>
+                        <td class="table-actions">
+                            <a href="{% url 'purchasing:supplier_detail' supplier.pk %}" class="btn btn-sm btn-info" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'purchasing:supplier_update' supplier.pk %}" class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'purchasing:supplier_delete' supplier.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-truck fa-4x text-muted mb-3"></i>
+            <p class="text-muted">No suppliers found</p>
+            <a href="{% url 'purchasing:supplier_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add First Supplier
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

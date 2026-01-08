@@ -1,0 +1,16 @@
+{%extends 'base.html'%}
+{%block title%}Purchase Requisition Details{%endblock%}
+{%block content%}
+<div class="page-header">
+    <h1>Purchase Requisition Details</h1>
+    <div class="actions">
+        <a href="{%url 'purchasing:requisition_update' object.pk%}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</a>
+        <a href="{%url 'purchasing:requisition_delete' object.pk%}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p>Details for {{object}}</p>
+    </div>
+</div>
+{%endblock%}

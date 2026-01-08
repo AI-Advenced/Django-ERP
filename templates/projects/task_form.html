@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Task - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-tasks me-2"></i>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Task</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{% url 'projects:task_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

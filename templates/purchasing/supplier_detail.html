@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ supplier.name }} - Supplier Details{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-truck"></i> {{ supplier.name }}</h1>
+    <div class="actions">
+        <a href="{% url 'purchasing:supplier_update' supplier.pk %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="{% url 'purchasing:supplier_delete' supplier.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Supplier Information</div>
+            <div class="card-body">
+                <p><strong>Code:</strong> {{ supplier.supplier_code }}</p>
+                <p><strong>Type:</strong> {{ supplier.get_supplier_type_display }}</p>
+                <p><strong>Email:</strong> {{ supplier.email }}</p>
+                <p><strong>Phone:</strong> {{ supplier.phone }}</p>
+                <p><strong>Status:</strong> <span class="badge status-{{ supplier.status }}">{{ supplier.get_status_display }}</span></p>
+                <p><strong>Rating:</strong> {{ supplier.rating }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Statistics</div>
+            <div class="card-body">
+                <p><strong>Total Orders:</strong> {{ total_pos }}</p>
+                <p><strong>Total Spend:</strong> ${{ total_spend|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

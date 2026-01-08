@@ -1,0 +1,38 @@
+{%extends 'base.html'%}
+{%block title%}RFQs{%endblock%}
+{%block content%}
+<div class="page-header">
+    <h1><i class="fas fa-comments-dollar"></i> RFQs</h1>
+    <div class="actions">
+        <a href="{%url 'purchasing:rfq_create'%}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add RFQ
+        </a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        {%if object_list%}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tbody>
+                    {%for obj in object_list%}
+                    <tr>
+                        <td><a href="{%url 'purchasing:rfq_detail' obj.pk%}">{{obj}}</a></td>
+                        <td class="table-actions">
+                            <a href="{%url 'purchasing:rfq_update' obj.pk%}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                            <a href="{%url 'purchasing:rfq_delete' obj.pk%}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+        {%else%}
+        <div class="text-center py-5">
+            <p>No rfqs found</p>
+            <a href="{%url 'purchasing:rfq_create'%}" class="btn btn-primary">Add First RFQ</a>
+        </div>
+        {%endif%}
+    </div>
+</div>
+{%endblock%}

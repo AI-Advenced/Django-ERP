@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Task - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-trash me-2"></i>Delete Task</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p>Are you sure you want to delete <strong>{{ object.title }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'projects:task_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

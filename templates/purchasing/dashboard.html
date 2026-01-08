@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchasing Dashboard - ERP System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-shopping-bag"></i> Purchasing & Procurement Dashboard</h1>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <div class="stat-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="stat-value">{{ active_suppliers_count }}</div>
+                <div class="stat-label">Active Suppliers</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="stat-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div class="stat-value">{{ total_pos }}</div>
+                <div class="stat-label">Total Purchase Orders</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">{{ pending_pos }}</div>
+                <div class="stat-label">Pending POs</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">${{ total_spend|floatformat:2 }}</div>
+                <div class="stat-label">Total Spend (30 days)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Purchase Orders -->
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-file-invoice me-2"></i>Recent Purchase Orders</span>
+                <a href="{% url 'purchasing:purchase_order_list' %}" class="btn btn-sm btn-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_pos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Supplier</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for po in recent_pos %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'purchasing:purchase_order_detail' po.pk %}" class="text-decoration-none fw-bold">
+                                        {{ po.po_number }}
+                                    </a>
+                                </td>
+                                <td>{{ po.supplier.name }}</td>
+                                <td>{{ po.po_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge status-{{ po.status }}">{{ po.get_status_display }}</span>
+                                </td>
+                                <td>${{ po.total_amount|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent purchase orders</p>
+                    <a href="{% url 'purchasing:purchase_order_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Purchase Order
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Requisitions -->
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-clipboard-list me-2"></i>Recent Requisitions</span>
+                <a href="{% url 'purchasing:requisition_list' %}" class="btn btn-sm btn-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_requisitions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Requisition #</th>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in recent_requisitions %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'purchasing:requisition_detail' req.pk %}" class="text-decoration-none fw-bold">
+                                        {{ req.requisition_number }}
+                                    </a>
+                                </td>
+                                <td>{{ req.title|truncatewords:5 }}</td>
+                                <td>{{ req.requisition_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge priority-{{ req.priority }}">{{ req.get_priority_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge status-{{ req.status }}">{{ req.get_status_display }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent requisitions</p>
+                    <a href="{% url 'purchasing:requisition_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Requisition
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Suppliers -->
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-star me-2"></i>Top Suppliers</span>
+                <a href="{% url 'purchasing:supplier_list' %}" class="btn btn-sm btn-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if top_suppliers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Code</th>
+                                <th>Orders</th>
+                                <th>Rating</th>
+                                <th>Total Spend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for supplier in top_suppliers %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'purchasing:supplier_detail' supplier.pk %}" class="text-decoration-none fw-bold">
+                                        {{ supplier.name }}
+                                    </a>
+                                </td>
+                                <td>{{ supplier.supplier_code }}</td>
+                                <td>{{ supplier.total_orders }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span>{{ supplier.rating }}</span>
+                                    </div>
+                                </td>
+                                <td>${{ supplier.total_amount|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No suppliers found</p>
+                    <a href="{% url 'purchasing:supplier_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Supplier
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bolt me-2"></i>Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="{% url 'purchasing:requisition_create' %}" class="btn btn-lg btn-primary">
+                        <i class="fas fa-plus-circle"></i> Create Purchase Requisition
+                    </a>
+                    <a href="{% url 'purchasing:purchase_order_create' %}" class="btn btn-lg btn-success">
+                        <i class="fas fa-file-invoice-dollar"></i> Create Purchase Order
+                    </a>
+                    <a href="{% url 'purchasing:rfq_create' %}" class="btn btn-lg btn-info">
+                        <i class="fas fa-comments-dollar"></i> Create RFQ
+                    </a>
+                    <a href="{% url 'purchasing:goods_receipt_create' %}" class="btn btn-lg btn-warning">
+                        <i class="fas fa-dolly"></i> Create Goods Receipt
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-center p-3 border rounded">
+                            <div class="text-danger fw-bold fs-4">{{ pending_requisitions }}</div>
+                            <div class="small text-muted">Pending Requisitions</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center p-3 border rounded">
+                            <div class="text-warning fw-bold fs-4">{{ pending_receipts }}</div>
+                            <div class="small text-muted">Pending Receipts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

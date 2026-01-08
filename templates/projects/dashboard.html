@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Project Management Dashboard - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-project-diagram me-2"></i>Project Management Dashboard</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active">Projects Dashboard</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 class="fs-2 fw-bold text-primary mb-1">{{ total_projects }}</h3>
+                    <p class="text-muted mb-0">Total Projects</p>
+                </div>
+                <div class="stat-icon primary">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 class="fs-2 fw-bold text-success mb-1">{{ active_projects }}</h3>
+                    <p class="text-muted mb-0">Active Projects</p>
+                </div>
+                <div class="stat-icon success">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 class="fs-2 fw-bold text-info mb-1">{{ total_tasks }}</h3>
+                    <p class="text-muted mb-0">Total Tasks</p>
+                </div>
+                <div class="stat-icon primary">
+                    <i class="fas fa-tasks"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 class="fs-2 fw-bold text-danger mb-1">{{ overdue_tasks }}</h3>
+                    <p class="text-muted mb-0">Overdue Tasks</p>
+                </div>
+                <div class="stat-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Projects -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-folder-open me-2"></i>Recent Projects</span>
+                <a href="{% url 'projects:project_list' %}" class="btn btn-sm btn-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_projects %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Status</th>
+                                    <th>Progress</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in recent_projects %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ project.code }}</strong><br>
+                                        <small class="text-muted">{{ project.name }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ project.status|yesno:'success,warning,danger' }}">
+                                            {{ project.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ project.progress }}%">
+                                                {{ project.progress }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ project.end_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-4">No projects found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- My Tasks & Milestones -->
+    <div class="col-lg-4">
+        <!-- My Tasks -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-tasks me-2"></i>My Tasks
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if my_tasks %}
+                    <div class="list-group list-group-flush">
+                        {% for task in my_tasks %}
+                        <a href="{% url 'projects:task_detail' task.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ task.title }}</h6>
+                                    <small class="text-muted">{{ task.project.name }}</small>
+                                </div>
+                                <span class="badge bg-{{ task.priority|yesno:'danger,warning,info' }}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </div>
+                            <small class="text-muted">Due: {{ task.due_date|date:"M d" }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-3">No tasks assigned.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Upcoming Milestones -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-flag-checkered me-2"></i>Upcoming Milestones
+            </div>
+            <div class="card-body">
+                {% if upcoming_milestones %}
+                    <div class="list-group list-group-flush">
+                        {% for milestone in upcoming_milestones %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ milestone.name }}</h6>
+                            <small class="text-muted">{{ milestone.project.name }}</small><br>
+                            <small class="text-muted">Due: {{ milestone.due_date|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-3">No upcoming milestones.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-bolt me-2"></i>Quick Actions
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <a href="{% url 'projects:project_create' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-2"></i>New Project
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'projects:task_create' %}" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-2"></i>New Task
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'projects:milestone_create' %}" class="btn btn-info w-100">
+                        <i class="fas fa-plus me-2"></i>New Milestone
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'projects:timeentry_create' %}" class="btn btn-warning w-100">
+                        <i class="fas fa-clock me-2"></i>Log Time
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
