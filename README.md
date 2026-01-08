@@ -420,12 +420,12 @@ CSRF_COOKIE_SECURE=False
 python manage.py makemigrations
 python manage.py migrate
 
-Or
+# Or
 python manage.py makemigrations name model
 python manage.py migrate name model
-do for all models
+# do for all models
 
-Exemple :
+# Exemple :
 python manage.py makemigrations crm
 python manage.py migrate crm
 ```
