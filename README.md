@@ -1,4 +1,4 @@
-# 🏢 Enterprise Resource Planning (ERP) System
+# 🏢 Enterprise Resource Planning (Django-ERP) System
 
 <div align="center">
 
