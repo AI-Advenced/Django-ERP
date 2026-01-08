@@ -1030,7 +1030,7 @@ SOFTWARE.
 - [Bootstrap](https://getbootstrap.com/) - CSS framework
 - [Font Awesome](https://fontawesome.com/) - Icons
 - [Chart.js](https://www.chartjs.org/) - Charts
-- [PostgreSQL](https://www.postgresql.org/) - Database
+- [SQLite](https://www.sqlite.org/) - Database
 
 ### Special Thanks
 
