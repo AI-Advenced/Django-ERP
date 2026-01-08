@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Tax Rate - ERP System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm mt-5">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirm Deletion
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Are you sure you want to delete the tax rate:</p>
+                    <p class="h5 text-center my-4">
+                        <strong>{{ object.name }}</strong> ({{ object.rate }}%)
+                    </p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone.
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                            <a href="{% url 'fiscal:taxrate_detail' object.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

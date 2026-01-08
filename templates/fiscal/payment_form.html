@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Payment{% else %}New Payment{% endif %} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-money-bill-wave text-success"></i>
+                {% if form.instance.pk %}Edit Payment{% else %}New Payment{% endif %}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:payment_list' %}"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}New{% endif %}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:payment_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i>
+                        Payment Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.payment_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hashtag"></i> Payment Number *
+                                </label>
+                                {{ form.payment_number }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.invoice.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-invoice"></i> Invoice *
+                                </label>
+                                {{ form.invoice }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-dollar-sign"></i> Amount *
+                                </label>
+                                {{ form.amount }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.payment_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar"></i> Payment Date *
+                                </label>
+                                {{ form.payment_date }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.payment_method.id_for_label }}" class="form-label">
+                                    <i class="fas fa-credit-card"></i> Payment Method *
+                                </label>
+                                {{ form.payment_method }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="fas fa-flag"></i> Status *
+                                </label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.reference.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag"></i> Reference / Transaction ID
+                            </label>
+                            {{ form.reference }}
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.pk %}Update Payment{% else %}Create Payment{% endif %}
+                            </button>
+                            <a href="{% url 'fiscal:payment_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-question-circle text-info"></i> Payment Methods</h6>
+                    <ul class="small">
+                        <li><strong>Cash:</strong> Physical cash payment</li>
+                        <li><strong>Bank Transfer:</strong> Direct bank transfer</li>
+                        <li><strong>Credit Card:</strong> Credit card payment</li>
+                        <li><strong>Debit Card:</strong> Debit card payment</li>
+                        <li><strong>Check:</strong> Check payment</li>
+                        <li><strong>PayPal:</strong> PayPal or similar</li>
+                        <li><strong>Other:</strong> Other payment methods</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Tips</h6>
+                    <ul class="small mb-0">
+                        <li>Enter the exact amount received</li>
+                        <li>Add reference number for tracking</li>
+                        <li>Confirmed payments update invoice status</li>
+                        <li>Partial payments are supported</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

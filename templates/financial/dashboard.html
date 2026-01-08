@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Dashboard - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-chart-line text-success"></i> Financial Dashboard</h1>
+        <p class="text-muted">Overview of your financial status</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">${{ total_revenue|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0 small">Total Revenue</p>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">${{ total_expenses|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0 small">Total Expenses</p>
+                        </div>
+                        <div class="text-danger">
+                            <i class="fas fa-receipt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card {% if net_profit >= 0 %}success{% else %}danger{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">${{ net_profit|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0 small">Net Profit</p>
+                        </div>
+                        <div class="text-{% if net_profit >= 0 %}success{% else %}danger{% endif %}">
+                            <i class="fas fa-chart-pie fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">${{ accounts_receivable|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0 small">Accounts Receivable</p>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-file-invoice-dollar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">${{ accounts_payable|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0 small">Accounts Payable</p>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-money-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body text-center">
+                    <a href="{% url 'financial:invoice_list' %}" class="text-decoration-none">
+                        <i class="fas fa-file-invoice fa-3x text-primary mb-2"></i>
+                        <h5>Invoices</h5>
+                        <p class="text-muted small mb-0">Manage Invoices</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body text-center">
+                    <a href="{% url 'financial:payment_list' %}" class="text-decoration-none">
+                        <i class="fas fa-hand-holding-usd fa-3x text-success mb-2"></i>
+                        <h5>Payments</h5>
+                        <p class="text-muted small mb-0">Track Payments</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body text-center">
+                    <a href="{% url 'financial:expense_list' %}" class="text-decoration-none">
+                        <i class="fas fa-wallet fa-3x text-warning mb-2"></i>
+                        <h5>Expenses</h5>
+                        <p class="text-muted small mb-0">Record Expenses</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Invoices -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-invoice"></i> Recent Invoices
+                    <a href="{% url 'financial:invoice_list' %}" class="btn btn-sm btn-primary float-end">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in recent_invoices %}
+                                <tr>
+                                    <td><a href="{% url 'financial:invoice_detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td>
+                                    <td>{{ invoice.customer.name }}</td>
+                                    <td>{{ invoice.invoice_date|date:"M d, Y" }}</td>
+                                    <td><span class="badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+                                    <td class="text-end">${{ invoice.total_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No invoices yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-hand-holding-usd"></i> Recent Payments
+                    <a href="{% url 'financial:payment_list' %}" class="btn btn-sm btn-success float-end">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Payment #</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                <tr>
+                                    <td><a href="{% url 'financial:payment_detail' payment.pk %}">{{ payment.payment_number }}</a></td>
+                                    <td>
+                                        <span class="badge {% if payment.payment_type == 'received' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ payment.get_payment_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                                    <td>{{ payment.get_payment_method_display }}</td>
+                                    <td class="text-end">${{ payment.amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No payments yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Expenses -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-wallet"></i> Recent Expenses
+                    <a href="{% url 'financial:expense_list' %}" class="btn btn-sm btn-warning float-end">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_expenses %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Expense #</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Vendor</th>
+                                    <th>Method</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in recent_expenses %}
+                                <tr>
+                                    <td><a href="{% url 'financial:expense_detail' expense.pk %}">{{ expense.expense_number }}</a></td>
+                                    <td>{{ expense.expense_date|date:"M d, Y" }}</td>
+                                    <td><span class="badge bg-light text-dark">{{ expense.get_category_display }}</span></td>
+                                    <td>{{ expense.description|truncatewords:5 }}</td>
+                                    <td>{{ expense.vendor_name|default:"-" }}</td>
+                                    <td>{{ expense.get_payment_method_display }}</td>
+                                    <td class="text-end">${{ expense.amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No expenses yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card a {
+        transition: transform 0.2s;
+    }
+    .card a:hover {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}

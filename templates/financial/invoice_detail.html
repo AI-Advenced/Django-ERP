@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Financial{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'financial:dashboard' %}">Financial</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'financial:invoice_list' %}">Invoices</a></li>
+                <li class="breadcrumb-item active">{{ invoice.invoice_number }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-file-invoice text-primary"></i> Invoice Details</h1>
+            <div>
+                <a href="{% url 'financial:invoice_update' invoice.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'financial:invoice_delete' invoice.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                <a href="{% url 'financial:invoice_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Invoice Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Invoice Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Invoice Number</h6>
+                            <p class="fw-bold">{{ invoice.invoice_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Status</h6>
+                            <p><span class="badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Customer</h6>
+                            <p>
+                                <a href="{% url 'financial:customer_detail' invoice.customer.pk %}" class="text-decoration-none">
+                                    {{ invoice.customer.name }}
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Customer Email</h6>
+                            <p>{{ invoice.customer.email|default:"-" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Invoice Date</h6>
+                            <p><i class="fas fa-calendar"></i> {{ invoice.invoice_date|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Due Date</h6>
+                            <p><i class="fas fa-calendar-check"></i> {{ invoice.due_date|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+
+                    {% if invoice.notes %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-2">Notes</h6>
+                            <p>{{ invoice.notes|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if invoice.terms %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-2">Terms and Conditions</h6>
+                            <p>{{ invoice.terms|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Invoice Items -->
+            {% if invoice.items.exists %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Invoice Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-end">Quantity</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Line Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in invoice.items.all %}
+                                <tr>
+                                    <td>{{ item.description }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.unit_price|floatformat:2 }}</td>
+                                    <td class="text-end">${{ item.line_total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <strong>${{ invoice.subtotal|floatformat:2 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax ({{ invoice.tax_rate }}%):</span>
+                        <strong>${{ invoice.tax_amount|floatformat:2 }}</strong>
+                    </div>
+                    {% if invoice.discount_amount > 0 %}
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Discount:</span>
+                        <strong>-${{ invoice.discount_amount|floatformat:2 }}</strong>
+                    </div>
+                    {% endif %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total Amount:</strong>
+                        <strong class="text-primary fs-5">${{ invoice.total_amount|floatformat:2 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Paid Amount:</span>
+                        <strong class="text-success">${{ invoice.paid_amount|floatformat:2 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <strong>Balance Due:</strong>
+                        <strong class="text-danger">${{ invoice.balance_due|floatformat:2 }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-clock"></i> Metadata</h6>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">
+                        <div class="mb-2">
+                            <strong>Created:</strong><br>
+                            {{ invoice.created_at|date:"F d, Y g:i A" }}
+                        </div>
+                        <div>
+                            <strong>Last Updated:</strong><br>
+                            {{ invoice.updated_at|date:"F d, Y g:i A" }}
+                        </div>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

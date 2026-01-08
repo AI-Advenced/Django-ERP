@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Contact{% else %}New Contact{% endif %} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'crm:contact_list' %}">Contacts</a></li>
+                <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}New{% endif %}</li>
+            </ol>
+        </nav>
+        <h1>
+            <i class="fas fa-address-book text-success"></i>
+            {% if form.instance.pk %}Edit Contact{% else %}Create New Contact{% endif %}
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Contact Information
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Personal Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    Last Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope"></i> Email <span class="text-danger">*</span>
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone"></i> Phone
+                                </label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Company Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.company.id_for_label }}" class="form-label">
+                                    <i class="fas fa-building"></i> Company
+                                </label>
+                                {{ form.company }}
+                                {% if form.company.errors %}
+                                <div class="text-danger small">{{ form.company.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.job_title.id_for_label }}" class="form-label">
+                                    <i class="fas fa-briefcase"></i> Job Title
+                                </label>
+                                {{ form.job_title }}
+                                {% if form.job_title.errors %}
+                                <div class="text-danger small">{{ form.job_title.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Address
+                            </label>
+                            {{ form.address }}
+                            {% if form.address.errors %}
+                            <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                                {{ form.city }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
+                                {{ form.country }}
+                            </div>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-clipboard-list"></i> Additional Details</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.contact_type.id_for_label }}" class="form-label">
+                                    Contact Type
+                                </label>
+                                {{ form.contact_type }}
+                                {% if form.contact_type.errors %}
+                                <div class="text-danger small">{{ form.contact_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.assigned_to.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user"></i> Assigned To
+                                </label>
+                                {{ form.assigned_to }}
+                                {% if form.assigned_to.errors %}
+                                <div class="text-danger small">{{ form.assigned_to.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="text-danger small">{{ form.notes.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'crm:contact_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                                {% if form.instance.pk %}Update Contact{% else %}Create Contact{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-question-circle"></i> Help & Tips
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Contact Types</h6>
+                    <ul class="small">
+                        <li><strong>Customer:</strong> Current customers</li>
+                        <li><strong>Prospect:</strong> Potential customers</li>
+                        <li><strong>Partner:</strong> Business partners</li>
+                        <li><strong>Vendor:</strong> Suppliers</li>
+                    </ul>
+
+                    <hr>
+
+                    <div class="alert alert-success mb-0 small">
+                        <i class="fas fa-star"></i>
+                        <strong>Tip:</strong> Keep contact information up to date for better communication!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    {{ form.media }}
+    .form-control, .form-select, textarea {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: #27ae60;
+        box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
+    }
+    textarea {
+        min-height: 100px;
+    }
+</style>
+{% endblock %}

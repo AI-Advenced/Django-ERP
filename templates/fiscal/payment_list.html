@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payments - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-money-bill-wave text-success"></i>
+                Payments
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item active">Payments</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:payment_create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> New Payment
+        </a>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search payments..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="payment_method" class="form-select">
+                        <option value="">All Methods</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="check">Check</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'fiscal:payment_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list"></i>
+                Payments List ({{ object_list.count }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Payment #</th>
+                            <th>Invoice</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in object_list %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'fiscal:payment_detail' payment.pk %}" class="text-decoration-none">
+                                    <strong>{{ payment.payment_number }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'fiscal:invoice_detail' payment.invoice.pk %}" class="text-decoration-none">
+                                    {{ payment.invoice.invoice_number }}
+                                </a>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar text-muted"></i>
+                                {{ payment.payment_date|date:"Y-m-d" }}
+                            </td>
+                            <td>
+                                <strong class="text-success">${{ payment.amount|floatformat:2 }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ payment.get_payment_method_display }}</span>
+                            </td>
+                            <td>
+                                {% if payment.status == 'confirmed' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Confirmed
+                                    </span>
+                                {% elif payment.status == 'pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle"></i> Cancelled
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'fiscal:payment_detail' payment.pk %}" 
+                                       class="btn btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:payment_update' payment.pk %}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:payment_delete' payment.pk %}" 
+                                       class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No payments found.</p>
+                <a href="{% url 'fiscal:payment_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Record First Payment
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

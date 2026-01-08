@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Tax Rate{% else %}New Tax Rate{% endif %} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-percent text-primary"></i>
+                {% if form.instance.pk %}Edit Tax Rate{% else %}New Tax Rate{% endif %}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:taxrate_list' %}"><i class="fas fa-percent"></i> Tax Rates</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}New{% endif %}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:taxrate_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i>
+                        Tax Rate Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag"></i> Tax Rate Name *
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.help_text %}
+                                <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tax_type.id_for_label }}" class="form-label">
+                                    <i class="fas fa-list"></i> Tax Type *
+                                </label>
+                                {{ form.tax_type }}
+                                {% if form.tax_type.help_text %}
+                                <small class="form-text text-muted">{{ form.tax_type.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.rate.id_for_label }}" class="form-label">
+                                    <i class="fas fa-percentage"></i> Rate (%) *
+                                </label>
+                                {{ form.rate }}
+                                {% if form.rate.help_text %}
+                                <small class="form-text text-muted">{{ form.rate.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.country.id_for_label }}" class="form-label">
+                                    <i class="fas fa-globe"></i> Country *
+                                </label>
+                                {{ form.country }}
+                                {% if form.country.help_text %}
+                                <small class="form-text text-muted">{{ form.country.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Start Date *
+                                </label>
+                                {{ form.start_date }}
+                                {% if form.start_date.help_text %}
+                                <small class="form-text text-muted">{{ form.start_date.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-check"></i> End Date
+                                </label>
+                                {{ form.end_date }}
+                                {% if form.end_date.help_text %}
+                                <small class="form-text text-muted">{{ form.end_date.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    <i class="fas fa-check-circle"></i> Active
+                                </label>
+                            </div>
+                            {% if form.is_active.help_text %}
+                            <small class="form-text text-muted">{{ form.is_active.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.help_text %}
+                            <small class="form-text text-muted">{{ form.description.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.pk %}Update Tax Rate{% else %}Create Tax Rate{% endif %}
+                            </button>
+                            <a href="{% url 'fiscal:taxrate_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-question-circle text-info"></i> Tax Types</h6>
+                    <ul class="small">
+                        <li><strong>VAT:</strong> Value Added Tax</li>
+                        <li><strong>Sales Tax:</strong> Point of sale tax</li>
+                        <li><strong>Income Tax:</strong> Tax on income</li>
+                        <li><strong>Corporate Tax:</strong> Tax on company profits</li>
+                        <li><strong>Withholding:</strong> Tax withheld at source</li>
+                        <li><strong>Excise:</strong> Tax on specific goods</li>
+                        <li><strong>Other:</strong> Other tax types</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Tips</h6>
+                    <ul class="small mb-0">
+                        <li>Enter the tax rate as a percentage (e.g., 19.5 for 19.5%)</li>
+                        <li>Set start and end dates to define validity period</li>
+                        <li>Only active tax rates can be used in invoices</li>
+                        <li>You can have multiple rates for the same tax type</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+    }
+    .card-header {
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+</style>
+{% endblock %}

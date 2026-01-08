@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacts - CRM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-user-plus"></i> Contacts</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'crm:contact_create' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add New Contact
+        </a>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Contacts</h5>
+                <h2>{{ total_contacts }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">New Contacts</h5>
+                <h2>{{ new_contacts }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Converted</h5>
+                <h2>{{ converted_contacts }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search by name, email, or company..." 
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Contacts Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Company</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                        <th>Assigned To</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'crm:contact_detail' contact.pk %}">
+                                {{ contact.get_full_name }}
+                            </a>
+                        </td>
+                        <td>{{ contact.company|default:"-" }}</td>
+                        <td>{{ contact.email }}</td>
+                        <td>{{ contact.phone|default:"-" }}</td>
+                        <td>
+                            <span class="badge bg-{% if contact.status == 'new' %}primary{% elif contact.status == 'converted' %}success{% else %}secondary{% endif %}">
+                                {{ contact.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ contact.get_source_display }}</td>
+                        <td>{{ contact.assigned_to.get_full_name|default:"Unassigned" }}</td>
+                        <td>{{ contact.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'crm:contact_delete' contact.pk %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            No contacts found. <a href="{% url 'crm:contact_create' %}">Create your first contact</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

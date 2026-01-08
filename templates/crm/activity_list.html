@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Activities - CRM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-tasks"></i> Activities</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'crm:activity_create' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add New Activity
+        </a>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6 class="card-title">Total Activities</h6>
+                <h2>{{ total_activities }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6 class="card-title">Pending</h6>
+                <h2>{{ pending_activities }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h6 class="card-title">Overdue</h6>
+                <h2>{{ overdue_activities }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search activities..." 
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="activity_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for value, label in activity_type_choices %}
+                    <option value="{{ value }}" {% if request.GET.activity_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Activities Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th>Related To</th>
+                        <th>Assigned To</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr {% if activity.status == 'planned' and activity.due_date < now %}class="table-danger"{% endif %}>
+                        <td>
+                            <a href="{% url 'crm:activity_detail' activity.pk %}">
+                                {{ activity.subject }}
+                            </a>
+                        </td>
+                        <td><span class="badge bg-info">{{ activity.get_activity_type_display }}</span></td>
+                        <td>
+                            <span class="badge bg-{% if activity.status == 'completed' %}success{% elif activity.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                {{ activity.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if activity.priority == 'high' %}danger{% elif activity.priority == 'medium' %}warning{% else %}secondary{% endif %}">
+                                {{ activity.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ activity.due_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if activity.lead %}
+                                Lead: <a href="{% url 'crm:lead_detail' activity.lead.pk %}">{{ activity.lead.get_full_name }}</a>
+                            {% elif activity.contact %}
+                                Contact: <a href="{% url 'crm:contact_detail' activity.contact.pk %}">{{ activity.contact.get_full_name }}</a>
+                            {% elif activity.opportunity %}
+                                Opportunity: <a href="{% url 'crm:opportunity_detail' activity.opportunity.pk %}">{{ activity.opportunity.name }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ activity.assigned_to.get_full_name|default:"Unassigned" }}</td>
+                        <td>
+                            <a href="{% url 'crm:activity_update' activity.pk %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'crm:activity_delete' activity.pk %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No activities found. <a href="{% url 'crm:activity_create' %}">Create your first activity</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

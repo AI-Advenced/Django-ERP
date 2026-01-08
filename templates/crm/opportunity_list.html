@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Opportunities - CRM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-dollar-sign"></i> Opportunities</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'crm:opportunity_create' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add New Opportunity
+        </a>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6 class="card-title">Total Opportunities</h6>
+                <h2>{{ total_opportunities }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h6 class="card-title">Total Value</h6>
+                <h2>${{ total_value|floatformat:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6 class="card-title">Won Deals</h6>
+                <h2>{{ won_opportunities }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h6 class="card-title">Active</h6>
+                <h2>{{ active_opportunities }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search by name or company..." 
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-4">
+                <select name="stage" class="form-select">
+                    <option value="">All Stages</option>
+                    {% for value, label in stage_choices %}
+                    <option value="{{ value }}" {% if request.GET.stage == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Opportunities Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Contact/Company</th>
+                        <th>Amount</th>
+                        <th>Stage</th>
+                        <th>Probability</th>
+                        <th>Expected Close</th>
+                        <th>Assigned To</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opportunity in opportunities %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'crm:opportunity_detail' opportunity.pk %}">
+                                {{ opportunity.name }}
+                            </a>
+                        </td>
+                        <td>{{ opportunity.contact.company|default:opportunity.contact.get_full_name }}</td>
+                        <td>${{ opportunity.amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="badge bg-{% if opportunity.stage == 'closed_won' %}success{% elif opportunity.stage == 'closed_lost' %}danger{% else %}primary{% endif %}">
+                                {{ opportunity.get_stage_display }}
+                            </span>
+                        </td>
+                        <td>{{ opportunity.probability }}%</td>
+                        <td>{{ opportunity.expected_close_date|date:"M d, Y" }}</td>
+                        <td>{{ opportunity.assigned_to.get_full_name|default:"Unassigned" }}</td>
+                        <td>
+                            <a href="{% url 'crm:opportunity_update' opportunity.pk %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'crm:opportunity_delete' opportunity.pk %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No opportunities found. <a href="{% url 'crm:opportunity_create' %}">Create your first opportunity</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

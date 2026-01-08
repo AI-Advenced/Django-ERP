@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ contact.get_full_name }} - Contact Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-address-book"></i> Contact Details</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-sm btn-warning me-2">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="{% url 'crm:contact_delete' contact.pk %}" class="btn btn-sm btn-danger me-2">
+            <i class="fas fa-trash"></i> Delete
+        </a>
+        <a href="{% url 'crm:contact_list' %}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Contact Information Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Full Name:</strong>
+                        <p>{{ contact.get_full_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Company:</strong>
+                        <p>{{ contact.company|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Email:</strong>
+                        <p><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Phone:</strong>
+                        <p><a href="tel:{{ contact.phone }}">{{ contact.phone|default:"-" }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Status:</strong>
+                        <p>
+                            <span class="badge bg-{% if contact.status == 'new' %}primary{% elif contact.status == 'converted' %}success{% else %}secondary{% endif %}">
+                                {{ contact.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Source:</strong>
+                        <p>{{ contact.get_source_display }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Assigned To:</strong>
+                        <p>{{ contact.assigned_to.get_full_name|default:"Unassigned" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Created By:</strong>
+                        <p>{{ contact.created_by.get_full_name|default:"Unknown" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Created:</strong>
+                        <p>{{ contact.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Last Updated:</strong>
+                        <p>{{ contact.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                {% if contact.description %}
+                <div class="row">
+                    <div class="col-12">
+                        <strong>Description:</strong>
+                        <p>{{ contact.description }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Activities Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Activities</h5>
+                    <a href="{% url 'crm:activity_create' %}?contact={{ contact.pk }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-plus"></i> Add Activity
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if activities %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td>{{ activity.subject }}</td>
+                                <td><span class="badge bg-info">{{ activity.get_activity_type_display }}</span></td>
+                                <td><span class="badge bg-{% if activity.status == 'completed' %}success{% elif activity.status == 'cancelled' %}danger{% else %}warning{% endif %}">{{ activity.get_status_display }}</span></td>
+                                <td>{{ activity.due_date|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'crm:activity_detail' activity.pk %}" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No activities recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Opportunities Card -->
+        {% if opportunities %}
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Opportunities</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Stage</th>
+                                <th>Probability</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for opp in opportunities %}
+                            <tr>
+                                <td>{{ opp.name }}</td>
+                                <td>${{ opp.amount }}</td>
+                                <td><span class="badge bg-primary">{{ opp.get_stage_display }}</span></td>
+                                <td>{{ opp.probability }}%</td>
+                                <td>
+                                    <a href="{% url 'crm:opportunity_detail' opp.pk %}" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Quick Actions Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'crm:activity_create' %}?contact={{ contact.pk }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Activity
+                    </a>
+                    <a href="{% url 'crm:opportunity_create' %}?contact={{ contact.pk }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Create Opportunity
+                    </a>
+                    <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Card -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-clock"></i> Timeline</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item mb-3">
+                        <small class="text-muted">{{ contact.created_at|date:"M d, Y" }}</small>
+                        <p class="mb-0">Contact created</p>
+                        <small>by {{ contact.created_by.get_full_name|default:"Unknown" }}</small>
+                    </div>
+                    {% if contact.updated_at != contact.created_at %}
+                    <div class="timeline-item mb-3">
+                        <small class="text-muted">{{ contact.updated_at|date:"M d, Y" }}</small>
+                        <p class="mb-0">Contact updated</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

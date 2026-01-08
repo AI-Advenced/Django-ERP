@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Invoice: {{ object.invoice_number }} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-file-invoice text-primary"></i>
+                Invoice Details
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:invoice_list' %}"><i class="fas fa-file-invoice"></i> Invoices</a></li>
+                    <li class="breadcrumb-item active">{{ object.invoice_number }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'fiscal:invoice_update' object.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <button onclick="window.print()" class="btn btn-info">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <a href="{% url 'fiscal:invoice_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Invoice Information -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-invoice"></i>
+                            Invoice {{ object.invoice_number }}
+                        </h5>
+                        {% if object.status == 'paid' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> PAID
+                            </span>
+                        {% elif object.status == 'pending' %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-clock"></i> PENDING
+                            </span>
+                        {% elif object.status == 'cancelled' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-ban"></i> CANCELLED
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-file"></i> DRAFT
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Invoice Header -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">BILL TO:</h6>
+                            <p class="mb-1"><strong>{{ object.customer_name }}</strong></p>
+                            {% if object.customer_email %}
+                            <p class="mb-1"><i class="fas fa-envelope text-muted"></i> {{ object.customer_email }}</p>
+                            {% endif %}
+                            {% if object.customer_address %}
+                            <p class="mb-0"><i class="fas fa-map-marker-alt text-muted"></i> {{ object.customer_address }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p class="mb-1">
+                                <strong>Invoice Type:</strong>
+                                <span class="badge bg-info">{{ object.get_invoice_type_display }}</span>
+                            </p>
+                            <p class="mb-1">
+                                <strong>Invoice Date:</strong>
+                                {{ object.invoice_date|date:"Y-m-d" }}
+                            </p>
+                            <p class="mb-1">
+                                <strong>Due Date:</strong>
+                                {{ object.due_date|date:"Y-m-d" }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Fiscal Year:</strong>
+                                {{ object.fiscal_year.name }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Invoice Items -->
+                    <h6 class="mb-3"><i class="fas fa-list"></i> Invoice Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Tax</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in object.items.all %}
+                                <tr>
+                                    <td>{{ item.description }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.unit_price|floatformat:2 }}</td>
+                                    <td class="text-center">
+                                        {% if item.tax_rate %}
+                                            {{ item.tax_rate.rate }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end"><strong>${{ item.total_amount|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No items added yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- Totals -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if object.notes %}
+                            <h6>Notes:</h6>
+                            <p class="text-muted">{{ object.notes|linebreaks }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td class="text-end"><strong>Subtotal:</strong></td>
+                                    <td class="text-end">${{ object.subtotal|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end"><strong>Tax:</strong></td>
+                                    <td class="text-end">${{ object.tax_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% if object.discount_amount %}
+                                <tr>
+                                    <td class="text-end"><strong>Discount:</strong></td>
+                                    <td class="text-end">-${{ object.discount_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr class="table-primary">
+                                    <td class="text-end"><strong>TOTAL:</strong></td>
+                                    <td class="text-end"><h5 class="mb-0">${{ object.total_amount|floatformat:2 }}</h5></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'fiscal:invoice_update' object.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Invoice
+                        </a>
+                        <button onclick="window.print()" class="btn btn-outline-info">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </button>
+                        <a href="{% url 'fiscal:invoice_delete' object.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Invoice
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock"></i> Metadata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Created</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-plus text-success"></i>
+                            {{ object.created_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small">Last Updated</label>
+                        <p class="mb-0">
+                            <i class="fas fa-sync-alt text-primary"></i>
+                            {{ object.updated_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, nav, .card-header, .sidebar { display: none; }
+        .card { border: none; box-shadow: none; }
+    }
+</style>
+{% endblock %}

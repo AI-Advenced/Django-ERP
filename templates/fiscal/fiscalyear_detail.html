@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fiscal Year: {{ object.name }} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-calendar-alt text-primary"></i>
+                Fiscal Year Details
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:fiscalyear_list' %}"><i class="fas fa-calendar-alt"></i> Fiscal Years</a></li>
+                    <li class="breadcrumb-item active">{{ object.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'fiscal:fiscalyear_update' object.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'fiscal:fiscalyear_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Information -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Fiscal Year Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Fiscal Year Name</label>
+                        <p class="h4">{{ object.name }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Start Date</label>
+                            <p class="h6">
+                                <i class="fas fa-calendar-alt text-success"></i>
+                                {{ object.start_date|date:"Y-m-d" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">End Date</label>
+                            <p class="h6">
+                                <i class="fas fa-calendar-check text-danger"></i>
+                                {{ object.end_date|date:"Y-m-d" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Status</label>
+                        <p>
+                            {% if object.is_closed %}
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-lock"></i> Closed
+                                </span>
+                            {% else %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-unlock"></i> Open
+                                </span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if object.description %}
+                    <div class="mb-0">
+                        <label class="text-muted small">Description</label>
+                        <p>{{ object.description|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions & Stats -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'fiscal:fiscalyear_update' object.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Fiscal Year
+                        </a>
+                        <a href="{% url 'fiscal:fiscalyear_delete' object.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Fiscal Year
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock"></i> Metadata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Created</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-plus text-success"></i>
+                            {{ object.created_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small">Last Updated</label>
+                        <p class="mb-0">
+                            <i class="fas fa-sync-alt text-primary"></i>
+                            {{ object.updated_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

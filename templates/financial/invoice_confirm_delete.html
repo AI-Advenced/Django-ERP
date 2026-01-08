@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Invoice - Financial{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'financial:dashboard' %}">Financial</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'financial:invoice_list' %}">Invoices</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'financial:invoice_detail' invoice.pk %}">{{ invoice.invoice_number }}</a></li>
+                <li class="breadcrumb-item active">Delete</li>
+            </ol>
+        </nav>
+        <h1><i class="fas fa-trash text-danger"></i> Delete Invoice</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p class="mb-4">Are you sure you want to delete the following invoice?</p>
+                    
+                    <div class="bg-light p-3 rounded mb-4">
+                        <h6><strong>Invoice #:</strong> {{ invoice.invoice_number }}</h6>
+                        <p class="mb-1"><strong>Customer:</strong> {{ invoice.customer.name }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ invoice.invoice_date|date:"F d, Y" }}</p>
+                        <p class="mb-1"><strong>Total Amount:</strong> ${{ invoice.total_amount|floatformat:2 }}</p>
+                        <p class="mb-0"><strong>Status:</strong> <span class="badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'financial:invoice_detail' invoice.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Yes, Delete Invoice
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

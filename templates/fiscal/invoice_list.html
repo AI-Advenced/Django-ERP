@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Invoices - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-file-invoice text-primary"></i>
+                Invoices
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item active">Invoices</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:invoice_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Invoice
+        </a>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search invoices..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="invoice_type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="sale" {% if request.GET.invoice_type == 'sale' %}selected{% endif %}>Sale</option>
+                        <option value="purchase" {% if request.GET.invoice_type == 'purchase' %}selected{% endif %}>Purchase</option>
+                        <option value="service" {% if request.GET.invoice_type == 'service' %}selected{% endif %}>Service</option>
+                        <option value="credit" {% if request.GET.invoice_type == 'credit' %}selected{% endif %}>Credit Note</option>
+                        <option value="debit" {% if request.GET.invoice_type == 'debit' %}selected{% endif %}>Debit Note</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
+                        <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'fiscal:invoice_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-file-invoice"></i> Total Invoices</h6>
+                    <h3>{{ object_list.count }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-check-circle"></i> Paid</h6>
+                    <h3>{{ object_list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-clock"></i> Pending</h6>
+                    <h3>0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-white bg-danger">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-ban"></i> Cancelled</h6>
+                    <h3>0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list"></i>
+                Invoices List ({{ object_list.count }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in object_list %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'fiscal:invoice_detail' invoice.pk %}" class="text-decoration-none">
+                                    <strong>{{ invoice.invoice_number }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <i class="fas fa-user text-muted"></i>
+                                {{ invoice.customer_name }}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ invoice.get_invoice_type_display }}</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar text-muted"></i>
+                                {{ invoice.invoice_date|date:"Y-m-d" }}
+                            </td>
+                            <td>
+                                <strong>${{ invoice.total_amount|floatformat:2 }}</strong>
+                            </td>
+                            <td>
+                                {% if invoice.status == 'draft' %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-file"></i> Draft
+                                    </span>
+                                {% elif invoice.status == 'pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                {% elif invoice.status == 'paid' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Paid
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-ban"></i> Cancelled
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'fiscal:invoice_detail' invoice.pk %}" 
+                                       class="btn btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:invoice_update' invoice.pk %}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:invoice_delete' invoice.pk %}" 
+                                       class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No invoices found.</p>
+                <a href="{% url 'fiscal:invoice_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Invoice
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

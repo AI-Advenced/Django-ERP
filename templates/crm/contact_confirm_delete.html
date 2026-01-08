@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Contact - {{ contact.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-exclamation-triangle text-danger"></i> Delete Contact</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-trash"></i> Confirm Deletion</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning!</strong> This action cannot be undone.
+                </div>
+
+                <p>Are you sure you want to delete the following contact?</p>
+
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ contact.get_full_name }}</h5>
+                        <p class="card-text">
+                            <strong>Company:</strong> {{ contact.company|default:"N/A" }}<br>
+                            <strong>Email:</strong> {{ contact.email }}<br>
+                            <strong>Status:</strong> {{ contact.get_status_display }}<br>
+                            <strong>Created:</strong> {{ contact.created_at|date:"M d, Y" }}
+                        </p>
+                    </div>
+                </div>
+
+                {% if activities %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    This contact has <strong>{{ activities|length }} related activities</strong> that will also be deleted.
+                </div>
+                {% endif %}
+
+                {% if opportunities %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    This contact has <strong>{{ opportunities|length }} related opportunities</strong>.
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'crm:contact_detail' contact.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Yes, Delete Contact
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

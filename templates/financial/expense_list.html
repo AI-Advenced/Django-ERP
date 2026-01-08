@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Expenses - Financial Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-wallet text-primary"></i> Expenses Management</h1>
+            <p class="text-muted mb-0">Track and manage business expenses</p>
+        </div>
+        <div>
+            <a href="{% url 'financial:expense_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Expense
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Expenses List
+        </div>
+        <div class="card-body p-0">
+            {% if expenses %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Expense #</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Vendor</th>
+                            <th>Payment Method</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'financial:expense_detail' expense.pk %}" class="fw-bold text-decoration-none">
+                                    {{ expense.expense_number }}
+                                </a>
+                            </td>
+                            <td>{{ expense.expense_date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ expense.get_category_display }}
+                                </span>
+                            </td>
+                            <td>{{ expense.vendor|default:"-" }}</td>
+                            <td>{{ expense.get_payment_method_display }}</td>
+                            <td class="text-end">${{ expense.amount|floatformat:2 }}</td>
+                            <td class="text-end table-actions">
+                                <a href="{% url 'financial:expense_detail' expense.pk %}" 
+                                   class="btn btn-sm btn-info" 
+                                   title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'financial:expense_update' expense.pk %}" 
+                                   class="btn btn-sm btn-warning" 
+                                   title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'financial:expense_delete' expense.pk %}" 
+                                   class="btn btn-sm btn-danger" 
+                                   title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-wallet fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No expenses found</h5>
+                <p class="text-muted">Start by recording your first expense</p>
+                <a href="{% url 'financial:expense_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Expense
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

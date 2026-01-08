@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tax Report: {{ object.name }} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-chart-line text-info"></i>
+                Tax Report Details
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:taxreport_list' %}"><i class="fas fa-chart-line"></i> Tax Reports</a></li>
+                    <li class="breadcrumb-item active">{{ object.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'fiscal:taxreport_update' object.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <button onclick="window.print()" class="btn btn-info">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <a href="{% url 'fiscal:taxreport_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Information -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Tax Report Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Report Name</label>
+                            <p class="h5">{{ object.name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Report Type</label>
+                            <p>
+                                <span class="badge bg-info">{{ object.get_report_type_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Start Date</label>
+                            <p class="h6">
+                                <i class="fas fa-calendar-alt text-success"></i>
+                                {{ object.start_date|date:"Y-m-d" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">End Date</label>
+                            <p class="h6">
+                                <i class="fas fa-calendar-check text-danger"></i>
+                                {{ object.end_date|date:"Y-m-d" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if object.fiscal_year %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Fiscal Year</label>
+                        <p>
+                            <a href="{% url 'fiscal:fiscalyear_detail' object.fiscal_year.pk %}" class="text-decoration-none">
+                                {{ object.fiscal_year.name }}
+                            </a>
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    {% if object.notes %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Notes</label>
+                        <p>{{ object.notes|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Report Data -->
+                    {% if object.report_data %}
+                    <div class="mt-4">
+                        <h6><i class="fas fa-database"></i> Report Data</h6>
+                        <div class="bg-light p-3 rounded">
+                            <pre class="mb-0"><code>{{ object.report_data }}</code></pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions & Stats -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'fiscal:taxreport_update' object.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Report
+                        </a>
+                        <button onclick="window.print()" class="btn btn-outline-info">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                        <a href="{% url 'fiscal:taxreport_delete' object.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Period Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar"></i> Period Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Period:</strong><br>
+                        {{ object.start_date|date:"Y-m-d" }} to {{ object.end_date|date:"Y-m-d" }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Duration:</strong><br>
+                        {% widthratio object.end_date|date:"U"|add:"-"|add:object.start_date|date:"U" 86400 1 %} days
+                    </p>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock"></i> Metadata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Generated</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-plus text-success"></i>
+                            {{ object.created_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small">Last Updated</label>
+                        <p class="mb-0">
+                            <i class="fas fa-sync-alt text-primary"></i>
+                            {{ object.updated_at|date:"Y-m-d H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .btn, nav, .card-header { display: none; }
+        .card { border: none; box-shadow: none; }
+    }
+    pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style>
+{% endblock %}

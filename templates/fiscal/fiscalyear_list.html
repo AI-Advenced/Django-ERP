@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fiscal Years - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-calendar-alt text-primary"></i>
+                Fiscal Years
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item active">Fiscal Years</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:fiscalyear_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Fiscal Year
+        </a>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search fiscal years..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="open" {% if request.GET.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'fiscal:fiscalyear_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fiscal Years Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list"></i>
+                Fiscal Years List ({{ object_list.count }})
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Year Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fiscalyear in object_list %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'fiscal:fiscalyear_detail' fiscalyear.pk %}" class="text-decoration-none">
+                                    <strong>{{ fiscalyear.name }}</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar-alt text-success"></i>
+                                {{ fiscalyear.start_date|date:"Y-m-d" }}
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar-check text-danger"></i>
+                                {{ fiscalyear.end_date|date:"Y-m-d" }}
+                            </td>
+                            <td>
+                                {% if fiscalyear.is_closed %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-lock"></i> Closed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-unlock"></i> Open
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'fiscal:fiscalyear_detail' fiscalyear.pk %}" 
+                                       class="btn btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:fiscalyear_update' fiscalyear.pk %}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'fiscal:fiscalyear_delete' fiscalyear.pk %}" 
+                                       class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No fiscal years found.</p>
+                <a href="{% url 'fiscal:fiscalyear_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Fiscal Year
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

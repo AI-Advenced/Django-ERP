@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Invoice{% else %}New Invoice{% endif %} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-file-invoice text-primary"></i>
+                {% if form.instance.pk %}Edit Invoice{% else %}New Invoice{% endif %}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:invoice_list' %}"><i class="fas fa-file-invoice"></i> Invoices</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}New{% endif %}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:invoice_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i>
+                        Invoice Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+
+                        <!-- Row 1: Invoice Details -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.invoice_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hashtag"></i> Invoice Number *
+                                </label>
+                                {{ form.invoice_number }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.invoice_type.id_for_label }}" class="form-label">
+                                    <i class="fas fa-list"></i> Invoice Type *
+                                </label>
+                                {{ form.invoice_type }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Fiscal Year *
+                                </label>
+                                {{ form.fiscal_year }}
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Customer Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.customer_name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user"></i> Customer Name *
+                                </label>
+                                {{ form.customer_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.customer_email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope"></i> Customer Email
+                                </label>
+                                {{ form.customer_email }}
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Address -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.customer_address.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Customer Address
+                                </label>
+                                {{ form.customer_address }}
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Dates -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.invoice_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar"></i> Invoice Date *
+                                </label>
+                                {{ form.invoice_date }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.due_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-check"></i> Due Date *
+                                </label>
+                                {{ form.due_date }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="fas fa-flag"></i> Status *
+                                </label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <!-- Row 5: Amounts -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.subtotal.id_for_label }}" class="form-label">
+                                    <i class="fas fa-dollar-sign"></i> Subtotal *
+                                </label>
+                                {{ form.subtotal }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.tax_amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-percent"></i> Tax Amount *
+                                </label>
+                                {{ form.tax_amount }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.discount_amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag"></i> Discount Amount
+                                </label>
+                                {{ form.discount_amount }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.total_amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-money-bill-wave"></i> Total Amount *
+                                </label>
+                                {{ form.total_amount }}
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.pk %}Update Invoice{% else %}Create Invoice{% endif %}
+                            </button>
+                            <a href="{% url 'fiscal:invoice_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-calculate total amount
+    document.addEventListener('DOMContentLoaded', function() {
+        const subtotalInput = document.querySelector('[name="subtotal"]');
+        const taxInput = document.querySelector('[name="tax_amount"]');
+        const discountInput = document.querySelector('[name="discount_amount"]');
+        const totalInput = document.querySelector('[name="total_amount"]');
+
+        function calculateTotal() {
+            const subtotal = parseFloat(subtotalInput.value) || 0;
+            const tax = parseFloat(taxInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 0;
+            const total = subtotal + tax - discount;
+            totalInput.value = total.toFixed(2);
+        }
+
+        if (subtotalInput && taxInput && totalInput) {
+            subtotalInput.addEventListener('input', calculateTotal);
+            taxInput.addEventListener('input', calculateTotal);
+            discountInput.addEventListener('input', calculateTotal);
+        }
+    });
+</script>
+{% endblock %}

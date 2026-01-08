@@ -1,0 +1,57 @@
+{%extends 'base.html'%}
+
+{%block title%}Accounts - Financial Management{%endblock%}
+
+{%block content%}
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-book text-primary"></i> Accounts Management</h1>
+            <p class="text-muted mb-0">Manage your accounts</p>
+        </div>
+        <div>
+            <a href="{%url 'financial:account_create'%}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Account
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Accounts List
+        </div>
+        <div class="card-body p-0">
+            {%if accounts%}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Code</th> <th>Name</th> <th>Type</th> <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for account in accounts%}
+                        <tr>
+                            <td><a href="{%url 'financial:account_detail' account.pk%}" class="fw-bold">{{ account.code }}</a></td>
+                            <td class="text-end table-actions">
+                                <a href="{%url 'financial:account_detail' account.pk%}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="{%url 'financial:account_update' account.pk%}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <a href="{%url 'financial:account_delete' account.pk%}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+            {%else%}
+            <div class="text-center py-5">
+                <i class="fas fa-book fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No accounts found</h5>
+                <a href="{%url 'financial:account_create'%}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Account</a>
+            </div>
+            {%endif%}
+        </div>
+    </div>
+</div>
+{%endblock%}

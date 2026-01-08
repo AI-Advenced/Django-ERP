@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Tax Report{% else %}Generate Tax Report{% endif %} - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">
+                <i class="fas fa-chart-line text-info"></i>
+                {% if form.instance.pk %}Edit Tax Report{% else %}Generate Tax Report{% endif %}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'base:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fiscal:taxreport_list' %}"><i class="fas fa-chart-line"></i> Tax Reports</a></li>
+                    <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}Generate{% endif %}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'fiscal:taxreport_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i>
+                        Tax Report Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag"></i> Report Name *
+                            </label>
+                            {{ form.name }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.report_type.id_for_label }}" class="form-label">
+                                <i class="fas fa-list"></i> Report Type *
+                            </label>
+                            {{ form.report_type }}
+                        </div>
+
+                        <!-- Period -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Start Date *
+                                </label>
+                                {{ form.start_date }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-check"></i> End Date *
+                                </label>
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+
+                        <!-- Fiscal Year -->
+                        <div class="mb-3">
+                            <label for="{{ form.fiscal_year.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar"></i> Fiscal Year
+                            </label>
+                            {{ form.fiscal_year }}
+                        </div>
+
+                        <!-- Report Data -->
+                        <div class="mb-3">
+                            <label for="{{ form.report_data.id_for_label }}" class="form-label">
+                                <i class="fas fa-database"></i> Report Data (JSON)
+                            </label>
+                            {{ form.report_data }}
+                            <small class="form-text text-muted">
+                                Enter report data in JSON format. Leave empty to auto-generate.
+                            </small>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.pk %}Update Report{% else %}Generate Report{% endif %}
+                            </button>
+                            <a href="{% url 'fiscal:taxreport_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-question-circle text-info"></i> Report Types</h6>
+                    <ul class="small">
+                        <li><strong>VAT Report:</strong> Value Added Tax summary</li>
+                        <li><strong>Sales Tax:</strong> Sales tax collected</li>
+                        <li><strong>Purchase Tax:</strong> Purchase tax paid</li>
+                        <li><strong>Income Tax:</strong> Income tax calculation</li>
+                        <li><strong>Custom:</strong> Custom tax report</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Tips</h6>
+                    <ul class="small mb-0">
+                        <li>Select a date range for the report period</li>
+                        <li>Reports are automatically generated from invoices</li>
+                        <li>You can export reports to PDF/Excel</li>
+                        <li>Link reports to fiscal years for better organization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

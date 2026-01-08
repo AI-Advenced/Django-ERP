@@ -1,0 +1,56 @@
+{%extends 'base.html'%}
+
+{%block title%}{%if form.instance.pk%}Edit{%else%}New{%endif%} JournalEntry - Financial{%endblock%}
+
+{%block content%}
+<div class="container-fluid">
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{%url 'financial:dashboard'%}">Financial</a></li>
+                <li class="breadcrumb-item"><a href="{%url 'financial:journalentry_list'%}">JournalEntrys</a></li>
+                <li class="breadcrumb-item active">{%if form.instance.pk%}Edit{%else%}New{%endif%}</li>
+            </ol>
+        </nav>
+        <h1><i class="fas fa-book-open text-primary"></i> {%if form.instance.pk%}Edit JournalEntry{%else%}Create New JournalEntry{%endif%}</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-info-circle"></i> JournalEntry Information</div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {%csrf_token%}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {{ form.as_p }}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{%url 'financial:journalentry_list'%}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {%if form.instance.pk%}Update{%else%}Create{%endif%}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

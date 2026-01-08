@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-tachometer-alt text-primary"></i> Dashboard</h1>
+        <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+
+    <!-- Main Stats -->
+    <div class="row">
+        <!-- CRM Stats -->
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_leads|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Total Leads</p>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-user-plus fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'crm:lead_list' %}" class="btn btn-sm btn-outline-primary w-100">View Leads</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_contacts|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Total Contacts</p>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-address-book fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'crm:contact_list' %}" class="btn btn-sm btn-outline-success w-100">View Contacts</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_opportunities|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Opportunities</p>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'crm:opportunity_list' %}" class="btn btn-sm btn-outline-warning w-100">View Opportunities</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_activities|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Activities</p>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-tasks fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'crm:activity_list' %}" class="btn btn-sm btn-outline-info w-100">View Activities</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Stats -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_products|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Total Products</p>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-box fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary w-100">View Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_stock|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Total Stock</p>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-cubes fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-success w-100">View Inventory</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.low_stock|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Low Stock Alert</p>
+                        </div>
+                        <div class="text-danger">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-danger w-100">View Alerts</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_warehouses|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Warehouses</p>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-warehouse fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'inventory:warehouse_list' %}" class="btn btn-sm btn-outline-info w-100">View Warehouses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-clock"></i> Recent Activities
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                    <div class="list-group list-group-flush">
+                        {% for activity in recent_activities %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-{{ activity.icon|default:'circle' }} text-primary fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-0">{{ activity.subject }}</h6>
+                                    <small class="text-muted">{{ activity.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-4">No recent activities</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <a href="{% url 'crm:lead_create' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-user-plus"></i><br>
+                                <span class="small">New Lead</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'crm:contact_create' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-address-book"></i><br>
+                                <span class="small">New Contact</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'inventory:product_create' %}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-box"></i><br>
+                                <span class="small">New Product</span>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'inventory:movement_create' %}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-exchange-alt"></i><br>
+                                <span class="small">Stock Movement</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Info -->
+            <div class="card mt-3">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-info-circle"></i> System Information
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-user text-primary"></i>
+                            <strong>User:</strong> {{ user.username }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope text-success"></i>
+                            <strong>Email:</strong> {{ user.email|default:"Not set" }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar text-info"></i>
+                            <strong>Today:</strong> {% now "F d, Y" %}
+                        </li>
+                        <li>
+                            <i class="fas fa-clock text-warning"></i>
+                            <strong>Time:</strong> {% now "H:i" %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
