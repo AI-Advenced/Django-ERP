@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Inventory - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-box"></i> {{ action }} Inventory Item</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'logistics:dashboard' %}">Logistics</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'logistics:inventory_list' %}">Inventory</a></li>
+            <li class="breadcrumb-item active">{{ action }}</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card">
+            <div class="card-header">Inventory Details</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3">Product Information</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.warehouse.label }}</label>
+                        {{ form.warehouse }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.product_code.label }}</label>
+                            {{ form.product_code }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.product_name.label }}</label>
+                            {{ form.product_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.category.label }}</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.bin_location.label }}</label>
+                            {{ form.bin_location }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.description.label }}</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Stock Levels</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.quantity_on_hand.label }}</label>
+                            {{ form.quantity_on_hand }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.quantity_reserved.label }}</label>
+                            {{ form.quantity_reserved }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.reorder_level.label }}</label>
+                            {{ form.reorder_level }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.reorder_quantity.label }}</label>
+                            {{ form.reorder_quantity }}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Costing</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.unit_cost.label }}</label>
+                            {{ form.unit_cost }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.last_count_date.label }}</label>
+                            {{ form.last_count_date }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Inventory
+                        </button>
+                        <a href="{% url 'logistics:inventory_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

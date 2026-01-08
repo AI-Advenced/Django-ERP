@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-tags text-primary"></i> Product Categories</h1>
+            <p class="text-muted mb-0">Organize your products by categories</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:category_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Category
+            </a>
+        </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="row">
+        {% if categories %}
+            {% for category in categories %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tag"></i>
+                                {{ category.name }}
+                            </h5>
+                            {% if category.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text text-muted">
+                            {{ category.description|default:"No description provided"|truncatewords:20 }}
+                        </p>
+
+                        <!-- Stats -->
+                        <div class="row text-center mt-4">
+                            <div class="col-6">
+                                <div class="bg-light rounded p-3">
+                                    <h3 class="mb-0 text-primary">{{ category.product_count|default:0 }}</h3>
+                                    <small class="text-muted">Products</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light rounded p-3">
+                                    <h3 class="mb-0 text-success">{{ category.total_stock|default:0 }}</h3>
+                                    <small class="text-muted">Total Stock</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i>
+                                {{ category.created_at|date:"M d, Y" }}
+                            </small>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'inventory:category_detail' category.pk %}" class="btn btn-sm btn-info" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventory:category_update' category.pk %}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'inventory:category_delete' category.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No categories found</h5>
+                    <p class="text-muted">Start by creating your first product category</p>
+                    <a href="{% url 'inventory:category_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Category
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

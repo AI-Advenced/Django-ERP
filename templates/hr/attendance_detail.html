@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}attendance Detail{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">attendance Details</h1>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <a href="{% url 'hr:attendance_list' %}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

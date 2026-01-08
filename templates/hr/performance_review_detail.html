@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}performance review Detail{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">performance review Details</h1>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <a href="{% url 'hr:performance_review_list' %}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

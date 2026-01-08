@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Warehouse{% else %}New Warehouse{% endif %} - Inventory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'inventory:warehouse_list' %}">Warehouses</a></li>
+                <li class="breadcrumb-item active">{% if form.instance.pk %}Edit{% else %}New{% endif %}</li>
+            </ol>
+        </nav>
+        <h1>
+            <i class="fas fa-warehouse text-info"></i>
+            {% if form.instance.pk %}Edit Warehouse{% else %}Create New Warehouse{% endif %}
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Warehouse Information
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <h5 class="mb-3"><i class="fas fa-clipboard-list"></i> Basic Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    Warehouse Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.code.id_for_label }}" class="form-label">
+                                    Code <span class="text-danger">*</span>
+                                </label>
+                                {{ form.code }}
+                                {% if form.code.errors %}
+                                <div class="text-danger small">{{ form.code.errors.0 }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Unique warehouse identifier</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Location Information -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-map-marker-alt"></i> Location</h5>
+
+                        <div class="mb-3">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">
+                                Address
+                            </label>
+                            {{ form.address }}
+                            {% if form.address.errors %}
+                            <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">
+                                    City
+                                </label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                <div class="text-danger small">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.country.id_for_label }}" class="form-label">
+                                    Country
+                                </label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                <div class="text-danger small">{{ form.country.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Management -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-user-tie"></i> Management</h5>
+
+                        <div class="mb-3">
+                            <label for="{{ form.manager.id_for_label }}" class="form-label">
+                                <i class="fas fa-user"></i> Warehouse Manager
+                            </label>
+                            {{ form.manager }}
+                            {% if form.manager.errors %}
+                            <div class="text-danger small">{{ form.manager.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Assign a manager responsible for this warehouse</small>
+                        </div>
+
+                        <!-- Status -->
+                        <hr class="my-4">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Warehouse is Active
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Inactive warehouses won't be available for stock assignments</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'inventory:warehouse_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-save"></i>
+                                {% if form.instance.pk %}Update Warehouse{% else %}Create Warehouse{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-question-circle"></i> Help & Tips
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Warehouse Code</h6>
+                    <ul class="small">
+                        <li>Use short, memorable codes (e.g., WH-01, NYC-MAIN)</li>
+                        <li>Make it unique across all warehouses</li>
+                        <li>Consider location in the code</li>
+                        <li>Avoid special characters</li>
+                    </ul>
+
+                    <hr>
+
+                    <h6><i class="fas fa-info-circle text-primary"></i> Best Practices</h6>
+                    <ul class="small">
+                        <li>Assign a dedicated manager</li>
+                        <li>Keep location information updated</li>
+                        <li>Use clear, descriptive names</li>
+                        <li>Document special handling requirements</li>
+                    </ul>
+
+                    <hr>
+
+                    <div class="alert alert-info mb-0 small">
+                        <i class="fas fa-star"></i>
+                        <strong>Tip:</strong> Multiple warehouses help you track inventory by location!
+                    </div>
+                </div>
+            </div>
+
+            {% if form.instance.pk %}
+            <div class="card mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <i class="fas fa-chart-bar"></i> Warehouse Stats
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary mb-0">0</h4>
+                            <small class="text-muted">Products</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success mb-0">0</h4>
+                            <small class="text-muted">Total Stock</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <p class="small mb-1">
+                        <strong>Created:</strong> {{ form.instance.created_at|date:"M d, Y" }}
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Last Updated:</strong> {{ form.instance.updated_at|date:"M d, Y" }}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    {{ form.media }}
+    .form-control, .form-select, textarea {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+    textarea {
+        min-height: 100px;
+    }
+    .form-check-input:checked {
+        background-color: #27ae60;
+        border-color: #27ae60;
+    }
+</style>
+{% endblock %}

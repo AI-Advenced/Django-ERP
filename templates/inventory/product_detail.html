@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}">Products</a></li>
+                <li class="breadcrumb-item active">{{ product.name }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-box text-primary"></i> {{ product.name }}</h1>
+            <div>
+                <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'inventory:product_delete' product.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Product Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Product Information
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">SKU</h6>
+                            <p class="fw-bold"><code>{{ product.sku }}</code></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">NAME</h6>
+                            <p class="fw-bold">{{ product.name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h6 class="text-muted small">DESCRIPTION</h6>
+                            <p>{{ product.description|default:"No description provided" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">CATEGORY</h6>
+                            <p>
+                                {% if product.category %}
+                                <span class="badge bg-light text-dark">{{ product.category.name }}</span>
+                                {% else %}-{% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">UNIT</h6>
+                            <p>{{ product.get_unit_display }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">STATUS</h6>
+                            <p>
+                                {% if product.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">PRICE</h6>
+                            <h4 class="text-success">${{ product.price|floatformat:2 }}</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">COST</h6>
+                            <h4 class="text-info">${{ product.cost|floatformat:2|default:"0.00" }}</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">MARGIN</h6>
+                            <h4 class="text-primary">
+                                {% widthratio product.price|floatformat:2|add:"-"|add:product.cost|floatformat:2 product.price 100 %}%
+                            </h4>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">CREATED AT</h6>
+                            <p>{{ product.created_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">LAST UPDATED</h6>
+                            <p>{{ product.updated_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Movements -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-exchange-alt"></i> Recent Stock Movements
+                </div>
+                <div class="card-body">
+                    {% if recent_movements %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Warehouse</th>
+                                    <th>Reference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movement in recent_movements %}
+                                <tr>
+                                    <td>{{ movement.movement_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ movement.badge_color }}">
+                                            {{ movement.get_movement_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ movement.quantity }}</td>
+                                    <td>{{ movement.warehouse.name|default:"-" }}</td>
+                                    <td>{{ movement.reference|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-3">No recent movements</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Stock Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-warehouse"></i> Stock Information
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted small">CURRENT STOCK</h6>
+                        {% if product.stock_quantity <= product.minimum_stock %}
+                        <h2 class="text-danger">{{ product.stock_quantity }}</h2>
+                        <span class="badge bg-danger">Low Stock Alert!</span>
+                        {% elif product.stock_quantity <= product.minimum_stock|add:10 %}
+                        <h2 class="text-warning">{{ product.stock_quantity }}</h2>
+                        <span class="badge bg-warning">Running Low</span>
+                        {% else %}
+                        <h2 class="text-success">{{ product.stock_quantity }}</h2>
+                        <span class="badge bg-success">In Stock</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted small">MINIMUM STOCK</h6>
+                        <p class="fw-bold">{{ product.minimum_stock|default:0 }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted small">WAREHOUSE</h6>
+                        <p>
+                            {% if product.warehouse %}
+                            <i class="fas fa-warehouse"></i> {{ product.warehouse.name }}
+                            {% else %}-{% endif %}
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted small">TOTAL VALUE</h6>
+                        <h3 class="text-success">${{ product.price|floatformat:2|add:product.stock_quantity }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'inventory:movement_create' %}?product={{ product.pk }}" class="btn btn-success">
+                            <i class="fas fa-arrow-down"></i> Stock In
+                        </a>
+                        <a href="{% url 'inventory:movement_create' %}?product={{ product.pk }}" class="btn btn-danger">
+                            <i class="fas fa-arrow-up"></i> Stock Out
+                        </a>
+                        <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit Product
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} training program{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">{{ action }} training program</h1>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save</button>
+                <a href="{% url 'hr:training_program_list' %}" class="btn btn-secondary"><i class="fas fa-times me-1"></i>Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

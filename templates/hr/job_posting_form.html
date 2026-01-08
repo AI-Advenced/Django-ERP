@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} job posting{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">{{ action }} job posting</h1>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save</button>
+                <a href="{% url 'hr:job_posting_list' %}" class="btn btn-secondary"><i class="fas fa-times me-1"></i>Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

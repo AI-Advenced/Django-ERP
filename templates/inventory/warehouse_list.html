@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Warehouses - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-warehouse text-primary"></i> Warehouses Management</h1>
+            <p class="text-muted mb-0">Manage your storage locations</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:warehouse_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Warehouse
+            </a>
+        </div>
+    </div>
+
+    <!-- Warehouses Grid -->
+    <div class="row">
+        {% if warehouses %}
+            {% for warehouse in warehouses %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-warehouse"></i>
+                                {{ warehouse.name }}
+                            </h5>
+                            {% if warehouse.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-muted small mb-2">CODE</h6>
+                            <code class="fs-5">{{ warehouse.code }}</code>
+                        </div>
+
+                        {% if warehouse.address %}
+                        <div class="mb-3">
+                            <h6 class="text-muted small mb-2"><i class="fas fa-map-marker-alt"></i> ADDRESS</h6>
+                            <p class="mb-0">{{ warehouse.address }}</p>
+                            {% if warehouse.city %}
+                            <p class="mb-0 text-muted small">{{ warehouse.city }}{% if warehouse.country %}, {{ warehouse.country }}{% endif %}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if warehouse.manager %}
+                        <div class="mb-3">
+                            <h6 class="text-muted small mb-2"><i class="fas fa-user"></i> MANAGER</h6>
+                            <p class="mb-0">{{ warehouse.manager.get_full_name|default:warehouse.manager.username }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if warehouse.description %}
+                        <div class="mb-3">
+                            <h6 class="text-muted small mb-2"><i class="fas fa-info-circle"></i> DESCRIPTION</h6>
+                            <p class="mb-0 small">{{ warehouse.description|truncatewords:20 }}</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Stats -->
+                        <div class="row text-center mt-4">
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <h4 class="mb-0 text-primary">{{ warehouse.product_count|default:0 }}</h4>
+                                    <small class="text-muted">Products</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <h4 class="mb-0 text-success">{{ warehouse.total_stock|default:0 }}</h4>
+                                    <small class="text-muted">Total Stock</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Created: {{ warehouse.created_at|date:"M d, Y" }}</small>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'inventory:warehouse_detail' warehouse.pk %}" class="btn btn-sm btn-info" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventory:warehouse_update' warehouse.pk %}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'inventory:warehouse_delete' warehouse.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-warehouse fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No warehouses found</h5>
+                    <p class="text-muted">Start by adding your first warehouse</p>
+                    <a href="{% url 'inventory:warehouse_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Warehouse
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

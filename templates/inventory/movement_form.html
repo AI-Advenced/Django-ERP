@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}New Stock Movement - Inventory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'inventory:movement_list' %}">Stock Movements</a></li>
+                <li class="breadcrumb-item active">New</li>
+            </ol>
+        </nav>
+        <h1>
+            <i class="fas fa-exchange-alt text-primary"></i>
+            Record Stock Movement
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Movement Information
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Movement Type -->
+                        <div class="mb-3">
+                            <label for="{{ form.movement_type.id_for_label }}" class="form-label">
+                                Movement Type <span class="text-danger">*</span>
+                            </label>
+                            {{ form.movement_type }}
+                            {% if form.movement_type.errors %}
+                            <div class="text-danger small">{{ form.movement_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Product and Warehouse -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.product.id_for_label }}" class="form-label">
+                                    <i class="fas fa-box"></i> Product <span class="text-danger">*</span>
+                                </label>
+                                {{ form.product }}
+                                {% if form.product.errors %}
+                                <div class="text-danger small">{{ form.product.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.warehouse.id_for_label }}" class="form-label">
+                                    <i class="fas fa-warehouse"></i> Warehouse <span class="text-danger">*</span>
+                                </label>
+                                {{ form.warehouse }}
+                                {% if form.warehouse.errors %}
+                                <div class="text-danger small">{{ form.warehouse.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Quantity and Date -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                    Quantity <span class="text-danger">*</span>
+                                </label>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                <div class="text-danger small">{{ form.quantity.errors.0 }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Number of units</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.movement_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar"></i> Movement Date <span class="text-danger">*</span>
+                                </label>
+                                {{ form.movement_date }}
+                                {% if form.movement_date.errors %}
+                                <div class="text-danger small">{{ form.movement_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Reference -->
+                        <div class="mb-3">
+                            <label for="{{ form.reference.id_for_label }}" class="form-label">
+                                <i class="fas fa-hashtag"></i> Reference Number
+                            </label>
+                            {{ form.reference }}
+                            {% if form.reference.errors %}
+                            <div class="text-danger small">{{ form.reference.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">PO number, invoice number, or other reference</small>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="text-danger small">{{ form.notes.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Additional information about this movement</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'inventory:movement_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Record Movement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-question-circle"></i> Movement Types
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-arrow-down text-success"></i> Stock In</h6>
+                    <p class="small">
+                        Receiving inventory from suppliers, returns from customers, or production.
+                    </p>
+
+                    <hr>
+
+                    <h6><i class="fas fa-arrow-up text-danger"></i> Stock Out</h6>
+                    <p class="small">
+                        Shipping to customers, transfers to other locations, or disposals.
+                    </p>
+
+                    <hr>
+
+                    <h6><i class="fas fa-edit text-warning"></i> Adjustment</h6>
+                    <p class="small">
+                        Correcting inventory counts due to physical count, damage, or theft.
+                    </p>
+
+                    <hr>
+
+                    <h6><i class="fas fa-exchange-alt text-info"></i> Transfer</h6>
+                    <p class="small">
+                        Moving stock between warehouses or locations.
+                    </p>
+
+                    <hr>
+
+                    <div class="alert alert-primary mb-0 small">
+                        <i class="fas fa-star"></i>
+                        <strong>Tip:</strong> Always include reference numbers for better tracking!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-lightbulb"></i> Best Practices
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li>Record movements as they happen</li>
+                        <li>Double-check quantities</li>
+                        <li>Include reference numbers</li>
+                        <li>Add detailed notes</li>
+                        <li>Verify warehouse selection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    {{ form.media }}
+    .form-control, .form-select, textarea {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    textarea {
+        min-height: 100px;
+    }
+    input[type="datetime-local"] {
+        padding: 8px;
+    }
+</style>
+{% endblock %}

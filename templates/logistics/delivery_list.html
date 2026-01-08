@@ -1,0 +1,33 @@
+{%extends "base.html" %}
+{%block title %}Deliverys - Django ERP{%endblock %}
+{%block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div><h1><i class="fas fa-list"></i> Deliverys</h1>
+            <nav aria-label="breadcrumb"><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{%url 'logistics:dashboard' %}">Logistics</a></li>
+                <li class="breadcrumb-item active">Deliverys</li>
+            </ol></nav>
+        </div>
+        <div><a href="{%url 'logistics:delivery_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Delivery</a></div>
+    </div>
+</div>
+<div class="card"><div class="card-body">
+    <div class="table-responsive"><table class="table table-hover">
+        <thead><tr><th>ID</th><th>Details</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {%for item in deliverys %}
+            <tr><td>{{item.pk}}</td><td><a href="{%url 'logistics:delivery_detail' item.pk %}">{{item}}</a></td>
+                <td><span class="badge bg-info">Active</span></td>
+                <td><div class="btn-group btn-group-sm">
+                    <a href="{%url 'logistics:delivery_detail' item.pk %}" class="btn btn-info"><i class="fas fa-eye"></i></a>
+                    <a href="{%url 'logistics:delivery_update' item.pk %}" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+                    <a href="{%url 'logistics:delivery_delete' item.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                </div></td>
+            </tr>
+            {%endfor %}
+        </tbody>
+    </table></div>
+</div></div>
+{%endblock %}

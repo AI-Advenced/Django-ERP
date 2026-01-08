@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Movements - Inventory Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-exchange-alt text-primary"></i> Stock Movements</h1>
+            <p class="text-muted mb-0">Track all inventory movements</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:movement_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Movement
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" class="form-control" placeholder="Search movements..." value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="movement_type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="in" {% if request.GET.movement_type == 'in' %}selected{% endif %}>Stock In</option>
+                        <option value="out" {% if request.GET.movement_type == 'out' %}selected{% endif %}>Stock Out</option>
+                        <option value="adjustment" {% if request.GET.movement_type == 'adjustment' %}selected{% endif %}>Adjustment</option>
+                        <option value="transfer" {% if request.GET.movement_type == 'transfer' %}selected{% endif %}>Transfer</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="product" class="form-select">
+                        <option value="">All Products</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}" {% if request.GET.product == product.id|stringformat:"s" %}selected{% endif %}>
+                            {{ product.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="date_from" class="form-control" placeholder="From Date" value="{{ request.GET.date_from }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="date_to" class="form-control" placeholder="To Date" value="{{ request.GET.date_to }}">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_in|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Stock In</p>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-arrow-down fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_out|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Stock Out</p>
+                        </div>
+                        <div class="text-danger">
+                            <i class="fas fa-arrow-up fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_adjustments|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Adjustments</p>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-edit fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">{{ stats.total_transfers|default:0 }}</h3>
+                            <p class="text-muted mb-0 small">Transfers</p>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-exchange-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movements Table -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Stock Movements History
+            <span class="badge bg-secondary float-end">{{ movements.count }} movements</span>
+        </div>
+        <div class="card-body p-0">
+            {% if movements %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Product</th>
+                            <th>Warehouse</th>
+                            <th>Quantity</th>
+                            <th>Reference</th>
+                            <th>Notes</th>
+                            <th>Created By</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movement in movements %}
+                        <tr>
+                            <td>
+                                <small class="fw-bold">{{ movement.movement_date|date:"M d, Y" }}</small><br>
+                                <small class="text-muted">{{ movement.movement_date|date:"H:i" }}</small>
+                            </td>
+                            <td>
+                                {% if movement.movement_type == 'in' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-arrow-down"></i> Stock In
+                                </span>
+                                {% elif movement.movement_type == 'out' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-arrow-up"></i> Stock Out
+                                </span>
+                                {% elif movement.movement_type == 'adjustment' %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-edit"></i> Adjustment
+                                </span>
+                                {% elif movement.movement_type == 'transfer' %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-exchange-alt"></i> Transfer
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'inventory:product_detail' movement.product.pk %}" class="text-decoration-none">
+                                    <strong>{{ movement.product.name }}</strong>
+                                </a><br>
+                                <small class="text-muted">SKU: {{ movement.product.sku }}</small>
+                            </td>
+                            <td>
+                                {% if movement.warehouse %}
+                                <i class="fas fa-warehouse"></i> {{ movement.warehouse.name }}
+                                {% else %}-{% endif %}
+                            </td>
+                            <td>
+                                {% if movement.movement_type == 'in' or movement.movement_type == 'transfer' %}
+                                <span class="text-success fw-bold">+{{ movement.quantity }}</span>
+                                {% else %}
+                                <span class="text-danger fw-bold">-{{ movement.quantity }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if movement.reference %}
+                                <code>{{ movement.reference }}</code>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td>
+                                {% if movement.notes %}
+                                <small>{{ movement.notes|truncatewords:10 }}</small>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td>
+                                {% if movement.created_by %}
+                                <small>{{ movement.created_by.get_full_name|default:movement.created_by.username }}</small>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td class="text-end table-actions">
+                                <a href="{% url 'inventory:movement_detail' movement.pk %}" class="btn btn-sm btn-info" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventory:movement_delete' movement.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No stock movements found</h5>
+                <p class="text-muted">Start by recording your first movement</p>
+                <a href="{% url 'inventory:movement_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Movement
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

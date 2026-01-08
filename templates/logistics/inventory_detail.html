@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ inventory.product_name }} - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-box"></i> {{ inventory.product_name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'logistics:dashboard' %}">Logistics</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'logistics:inventory_list' %}">Inventory</a></li>
+                    <li class="breadcrumb-item active">{{ inventory.product_code }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'logistics:inventory_update' inventory.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'logistics:inventory_delete' inventory.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if is_below_reorder %}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>Low Stock Alert:</strong> This item is below the reorder level.
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">Product Information</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Product Code:</strong> {{ inventory.product_code }}</p>
+                        <p><strong>Product Name:</strong> {{ inventory.product_name }}</p>
+                        <p><strong>Category:</strong> {{ inventory.category|default:"-" }}</p>
+                        <p><strong>Warehouse:</strong> 
+                            <a href="{% url 'logistics:warehouse_detail' inventory.warehouse.pk %}">
+                                {{ inventory.warehouse.name }}
+                            </a>
+                        </p>
+                        <p><strong>Bin Location:</strong> {{ inventory.bin_location|default:"-" }}</p>
+                        <p><strong>Last Count Date:</strong> {{ inventory.last_count_date|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Description:</strong><br>{{ inventory.description|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Quantity On Hand</h6>
+            <h3>{{ inventory.quantity_on_hand|floatformat:2 }}</h3>
+        </div>
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Available</h6>
+            <h3>{{ inventory.quantity_available|floatformat:2 }}</h3>
+        </div>
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Reserved</h6>
+            <h3>{{ inventory.quantity_reserved|floatformat:2 }}</h3>
+        </div>
+        <div class="stat-card">
+            <h6 class="text-muted mb-2">Total Value</h6>
+            <h3>${{ inventory.total_value|floatformat:2 }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Movements -->
+<div class="card">
+    <div class="card-header">Recent Stock Movements</div>
+    <div class="card-body">
+        {% if stock_movements %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Movement #</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in stock_movements %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'logistics:stock_movement_detail' movement.pk %}">
+                                {{ movement.movement_number }}
+                            </a>
+                        </td>
+                        <td>{{ movement.get_movement_type_display }}</td>
+                        <td>{{ movement.movement_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if movement.quantity > 0 %}
+                                <span class="text-success">+{{ movement.quantity|floatformat:2 }}</span>
+                            {% else %}
+                                <span class="text-danger">{{ movement.quantity|floatformat:2 }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ movement.reference_document|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No stock movements recorded</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

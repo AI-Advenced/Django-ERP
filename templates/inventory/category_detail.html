@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - Category Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'inventory:category_list' %}">Categories</a></li>
+                <li class="breadcrumb-item active">{{ category.name }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-tags text-primary"></i> {{ category.name }}</h1>
+            <div>
+                <a href="{% url 'inventory:category_update' category.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'inventory:category_delete' category.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Category Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Category Information
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h6 class="text-muted small">CATEGORY NAME</h6>
+                            <h3>{{ category.name }}</h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted small">STATUS</h6>
+                            <p>
+                                {% if category.is_active %}
+                                <span class="badge bg-success fs-6">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary fs-6">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h6 class="text-muted small">DESCRIPTION</h6>
+                            <p>{{ category.description|default:"No description provided" }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">CREATED AT</h6>
+                            <p>{{ category.created_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">LAST UPDATED</h6>
+                            <p>{{ category.updated_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products in Category -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-box"></i> Products in this Category
+                </div>
+                <div class="card-body">
+                    <p class="text-center text-muted py-3">No products in this category yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Statistics -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h2 class="text-primary mb-0">0</h2>
+                            <small class="text-muted">Products</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h2 class="text-success mb-0">0</h2>
+                            <small class="text-muted">Total Stock</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-warning mb-0">0</h4>
+                            <small class="text-muted">Active</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-0">$0.00</h4>
+                            <small class="text-muted">Total Value</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'inventory:product_create' %}?category={{ category.pk }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Product
+                        </a>
+                        <a href="{% url 'inventory:product_list' %}?category={{ category.pk }}" class="btn btn-info">
+                            <i class="fas fa-list"></i> View Products
+                        </a>
+                        <a href="{% url 'inventory:category_update' category.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit Category
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

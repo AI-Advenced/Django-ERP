@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Movement Details - Inventory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'inventory:movement_list' %}">Stock Movements</a></li>
+                <li class="breadcrumb-item active">Details</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-exchange-alt text-primary"></i> Stock Movement Details</h1>
+            <div>
+                <a href="{% url 'inventory:movement_delete' movement.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Movement Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Movement Information
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">MOVEMENT TYPE</h6>
+                            <p>
+                                {% if movement.movement_type == 'in' %}
+                                <span class="badge bg-success fs-5">
+                                    <i class="fas fa-arrow-down"></i> Stock In
+                                </span>
+                                {% elif movement.movement_type == 'out' %}
+                                <span class="badge bg-danger fs-5">
+                                    <i class="fas fa-arrow-up"></i> Stock Out
+                                </span>
+                                {% elif movement.movement_type == 'adjustment' %}
+                                <span class="badge bg-warning fs-5">
+                                    <i class="fas fa-edit"></i> Adjustment
+                                </span>
+                                {% elif movement.movement_type == 'transfer' %}
+                                <span class="badge bg-info fs-5">
+                                    <i class="fas fa-exchange-alt"></i> Transfer
+                                </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">MOVEMENT DATE</h6>
+                            <p class="fw-bold">{{ movement.movement_date|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">PRODUCT</h6>
+                            <p>
+                                <a href="{% url 'inventory:product_detail' movement.product.pk %}" class="text-decoration-none">
+                                    <i class="fas fa-box"></i> <strong>{{ movement.product.name }}</strong>
+                                </a><br>
+                                <small class="text-muted">SKU: {{ movement.product.sku }}</small>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">WAREHOUSE</h6>
+                            <p>
+                                {% if movement.warehouse %}
+                                <a href="{% url 'inventory:warehouse_detail' movement.warehouse.pk %}" class="text-decoration-none">
+                                    <i class="fas fa-warehouse"></i> {{ movement.warehouse.name }}
+                                </a><br>
+                                <small class="text-muted">Code: {{ movement.warehouse.code }}</small>
+                                {% else %}-{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">QUANTITY</h6>
+                            <h2>
+                                {% if movement.movement_type == 'in' or movement.movement_type == 'transfer' %}
+                                <span class="text-success">+{{ movement.quantity }}</span>
+                                {% else %}
+                                <span class="text-danger">-{{ movement.quantity }}</span>
+                                {% endif %}
+                            </h2>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">REFERENCE</h6>
+                            <p>
+                                {% if movement.reference %}
+                                <code>{{ movement.reference }}</code>
+                                {% else %}-{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h6 class="text-muted small">NOTES</h6>
+                            <p>{{ movement.notes|default:"No notes provided" }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">CREATED BY</h6>
+                            <p>
+                                {% if movement.created_by %}
+                                <i class="fas fa-user"></i> {{ movement.created_by.get_full_name|default:movement.created_by.username }}
+                                {% else %}-{% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">CREATED AT</h6>
+                            <p>{{ movement.created_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Impact Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-chart-line"></i> Impact Summary
+                </div>
+                <div class="card-body">
+                    <h6 class="text-muted small">PRODUCT AFFECTED</h6>
+                    <p class="fw-bold">{{ movement.product.name }}</p>
+
+                    <h6 class="text-muted small mt-3">CURRENT STOCK</h6>
+                    <h3 class="text-primary">{{ movement.product.stock_quantity }}</h3>
+
+                    <h6 class="text-muted small mt-3">MOVEMENT IMPACT</h6>
+                    <h3>
+                        {% if movement.movement_type == 'in' or movement.movement_type == 'transfer' %}
+                        <span class="text-success">+{{ movement.quantity }}</span>
+                        {% else %}
+                        <span class="text-danger">-{{ movement.quantity }}</span>
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'inventory:product_detail' movement.product.pk %}" class="btn btn-primary">
+                            <i class="fas fa-box"></i> View Product
+                        </a>
+                        {% if movement.warehouse %}
+                        <a href="{% url 'inventory:warehouse_detail' movement.warehouse.pk %}" class="btn btn-info">
+                            <i class="fas fa-warehouse"></i> View Warehouse
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'inventory:movement_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> New Movement
+                        </a>
+                        <a href="{% url 'inventory:movement_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-list"></i> All Movements
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}HR Dashboard - ERP System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-3"><i class="fas fa-users me-2"></i>Human Resources Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3">
+                                <i class="fas fa-user-tie fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Active Employees</h6>
+                            <h2 class="mb-0">{{ total_employees }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 text-success rounded-circle p-3">
+                                <i class="fas fa-building fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Departments</h6>
+                            <h2 class="mb-0">{{ total_departments }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-3">
+                                <i class="fas fa-calendar-alt fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Pending Leaves</h6>
+                            <h2 class="mb-0">{{ pending_leave_requests }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 text-info rounded-circle p-3">
+                                <i class="fas fa-briefcase fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Active Job Postings</h6>
+                            <h2 class="mb-0">{{ active_job_postings }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Info Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user-clock text-primary me-2"></i>
+                        <h6 class="mb-0">Pending Interviews</h6>
+                    </div>
+                    <h3 class="mb-0">{{ pending_interviews }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-graduation-cap text-success me-2"></i>
+                        <h6 class="mb-0">Ongoing Training</h6>
+                    </div>
+                    <h3 class="mb-0">{{ ongoing_trainings }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Hires -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Recent Hires</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_hires %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Position</th>
+                                        <th>Hire Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for employee in recent_hires %}
+                                        <tr>
+                                            <td>{{ employee.employee_id }}</td>
+                                            <td>{{ employee.full_name }}</td>
+                                            <td>{{ employee.department|default:"N/A" }}</td>
+                                            <td>{{ employee.position }}</td>
+                                            <td>{{ employee.hire_date|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent hires</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{% url 'hr:employee_list' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-users me-1"></i>View All Employees
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'hr:employee_create' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-user-plus me-1"></i>Add Employee
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'hr:attendance_create' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-clock me-1"></i>Mark Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'hr:leave_request_create' %}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-calendar-alt me-1"></i>Create Leave Request
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="{% url 'hr:job_posting_create' %}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-briefcase me-1"></i>Post Job
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}{{ warehouse.name }} - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-warehouse"></i> {{ warehouse.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'logistics:dashboard' %}">Logistics</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'logistics:warehouse_list' %}">Warehouses</a></li>
+                    <li class="breadcrumb-item active">{{ warehouse.code }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'logistics:warehouse_update' warehouse.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'logistics:warehouse_delete' warehouse.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Warehouse Info -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">Warehouse Information</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Code:</strong> {{ warehouse.code }}</p>
+                        <p><strong>Type:</strong> {{ warehouse.get_warehouse_type_display }}</p>
+                        <p><strong>Status:</strong>
+                            {% if warehouse.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Manager:</strong> {{ warehouse.manager_name|default:"-" }}</p>
+                        <p><strong>Email:</strong> {{ warehouse.contact_email|default:"-" }}</p>
+                        <p><strong>Phone:</strong> {{ warehouse.contact_phone|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Address:</strong><br>{{ warehouse.address }}</p>
+                        <p><strong>City:</strong> {{ warehouse.city }}</p>
+                        <p><strong>State:</strong> {{ warehouse.state|default:"-" }}</p>
+                        <p><strong>Country:</strong> {{ warehouse.country }}</p>
+                        <p><strong>Postal Code:</strong> {{ warehouse.postal_code|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Total Capacity</h6>
+            <h3>{{ warehouse.total_capacity|floatformat:2 }} m³</h3>
+        </div>
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Current Utilization</h6>
+            <h3>{{ utilization_percentage|floatformat:1 }}%</h3>
+            <div class="progress mt-2">
+                <div class="progress-bar {% if utilization_percentage > 90 %}bg-danger{% elif utilization_percentage > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                     style="width: {{ utilization_percentage }}%">
+                </div>
+            </div>
+        </div>
+        <div class="stat-card mb-3">
+            <h6 class="text-muted mb-2">Total Items</h6>
+            <h3>{{ total_items }}</h3>
+        </div>
+        <div class="stat-card">
+            <h6 class="text-muted mb-2">Total Value</h6>
+            <h3>${{ total_value|floatformat:2 }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory Items -->
+<div class="card mb-4">
+    <div class="card-header">Inventory Items</div>
+    <div class="card-body">
+        {% if inventory_items %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
+                        <th>On Hand</th>
+                        <th>Available</th>
+                        <th>Unit Cost</th>
+                        <th>Total Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventory_items %}
+                    <tr>
+                        <td><strong>{{ item.product_code }}</strong></td>
+                        <td>
+                            <a href="{% url 'logistics:inventory_detail' item.pk %}">
+                                {{ item.product_name }}
+                            </a>
+                        </td>
+                        <td>{{ item.quantity_on_hand|floatformat:2 }}</td>
+                        <td>{{ item.quantity_available|floatformat:2 }}</td>
+                        <td>${{ item.unit_cost|floatformat:2 }}</td>
+                        <td>${{ item.total_value|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'logistics:inventory_list' %}?warehouse={{ warehouse.id }}" class="btn btn-outline-primary">
+                View All Inventory <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No inventory items</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

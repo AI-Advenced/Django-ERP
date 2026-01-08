@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete category - Inventory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="page-header text-center">
+                <h1 class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirm Delete
+                </h1>
+            </div>
+
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-trash-alt"></i> Delete category
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone!
+                    </div>
+
+                    <p class="lead text-center mb-4">
+                        Are you sure you want to delete <strong>"{{ object }}"</strong>?
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Yes, Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

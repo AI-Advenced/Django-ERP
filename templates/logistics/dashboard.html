@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Logistics Dashboard - Django ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Logistics & Supply Chain Dashboard</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active">Logistics Dashboard</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted mb-1">Active Warehouses</div>
+                    <h3 class="mb-0">{{ total_warehouses }}</h3>
+                </div>
+                <div class="stat-icon primary">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted mb-1">Total Inventory Value</div>
+                    <h3 class="mb-0">${{ total_inventory_value|floatformat:2 }}</h3>
+                </div>
+                <div class="stat-icon success">
+                    <i class="fas fa-boxes"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted mb-1">Active Shipments</div>
+                    <h3 class="mb-0">{{ active_shipments }}</h3>
+                </div>
+                <div class="stat-icon warning">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted mb-1">Pending Deliveries</div>
+                    <h3 class="mb-0">{{ pending_deliveries }}</h3>
+                </div>
+                <div class="stat-icon danger">
+                    <i class="fas fa-dolly"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts -->
+{% if low_stock_items > 0 %}
+<div class="alert alert-warning mb-4">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>Low Stock Alert:</strong> {{ low_stock_items }} item(s) are below reorder level.
+    <a href="{% url 'logistics:inventory_list' %}?low_stock=1" class="alert-link">View items</a>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Recent Shipments -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-shipping-fast"></i> Recent Shipments
+            </div>
+            <div class="card-body">
+                {% if recent_shipments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Shipment #</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for shipment in recent_shipments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'logistics:shipment_detail' shipment.pk %}">
+                                            {{ shipment.shipment_number }}
+                                        </a>
+                                    </td>
+                                    <td>{{ shipment.get_shipment_type_display }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if shipment.status == 'delivered' %}success{% elif shipment.status == 'in_transit' %}info{% elif shipment.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                            {{ shipment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ shipment.created_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'logistics:shipment_list' %}" class="btn btn-sm btn-outline-primary">
+                            View All Shipments <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No recent shipments</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Warehouse Utilization -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-warehouse"></i> Warehouse Utilization
+            </div>
+            <div class="card-body">
+                {% if warehouses %}
+                    {% for warehouse in warehouses %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-bold">{{ warehouse.name }}</small>
+                            <small>{{ warehouse.utilization_percentage|floatformat:1 }}%</small>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar {% if warehouse.utilization_percentage > 90 %}bg-danger{% elif warehouse.utilization_percentage > 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ warehouse.utilization_percentage }}%"
+                                 aria-valuenow="{{ warehouse.utilization_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'logistics:warehouse_list' %}" class="btn btn-sm btn-outline-primary">
+                            View All Warehouses <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No warehouses found</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-bolt"></i> Quick Actions
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'logistics:warehouse_create' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus"></i> New Warehouse
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'logistics:inventory_create' %}" class="btn btn-success w-100">
+                    <i class="fas fa-plus"></i> Add Inventory
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'logistics:shipment_create' %}" class="btn btn-info w-100">
+                    <i class="fas fa-plus"></i> Create Shipment
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="{% url 'logistics:delivery_create' %}" class="btn btn-warning w-100">
+                    <i class="fas fa-plus"></i> Schedule Delivery
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
