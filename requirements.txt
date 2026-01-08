@@ -1,0 +1,5 @@
+Django==3.2.25
+django-crispy-forms==1.14.0
+Pillow==10.0.0
+python-decouple==3.8
+dj-database-url==2.1.0
