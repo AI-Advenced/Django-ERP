@@ -42,9 +42,9 @@
 
 ## 🌟 Overview
 
-**EERRPP (Enterprise Resource Planning Platform)** is a modern, full-featured ERP system designed to streamline business operations and improve organizational efficiency. Built with Django and modern web technologies, it provides a robust, scalable, and user-friendly solution for managing all aspects of your business.
+**Django-ERP (Enterprise Resource Planning Platform)** is a modern, full-featured ERP system designed to streamline business operations and improve organizational efficiency. Built with Django and modern web technologies, it provides a robust, scalable, and user-friendly solution for managing all aspects of your business.
 
-### Why Choose EERRPP?
+### Why Choose Django-ERP?
 
 - 🚀 **Modern Architecture** - Built with Django 4.2+ and latest web technologies
 - 🎨 **Beautiful UI/UX** - Responsive Bootstrap 5 interface with intuitive design
@@ -369,7 +369,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'eerrpp_db',
+        'NAME': 'Django-ERP_db',
         'USER': 'your_username',
         'PASSWORD': 'your_password',
         'HOST': 'localhost',
@@ -390,7 +390,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Database
 DB_ENGINE=django.db.backends.postgresql
-DB_NAME=eerrpp_db
+DB_NAME=Django-ERP_db
 DB_USER=your_username
 DB_PASSWORD=your_password
 DB_HOST=localhost
@@ -830,8 +830,8 @@ services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_DB: eerrpp_db
-      POSTGRES_USER: eerrpp_user
+      POSTGRES_DB: Django-ERP_db
+      POSTGRES_USER: Django-ERP_user
       POSTGRES_PASSWORD: secure_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -884,8 +884,8 @@ We welcome contributions from the community! Here's how you can help:
 
 1. **Fork the Repository**
    ```bash
-   git clone https://github.com/AI-Advenced/EERRPP.git
-   cd EERRPP
+   git clone https://github.com/AI-Advenced/Django-ERP.git
+   cd Django-ERP
    ```
 
 2. **Create a Feature Branch**
@@ -935,7 +935,7 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 - **Documentation**: Check our comprehensive docs
 - **GitHub Issues**: [Report bugs or request features](https://github.com/AI-Advenced/Django-ERP/issues)
 - **Discussions**: [Join community discussions](https://github.com/AI-Advenced/Django-ERP/discussions)
-- **Email**: support@eerrpp.com
+- **Email**: support@Django-ERP.com
 
 ### Frequently Asked Questions
 
@@ -960,7 +960,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2026 EERRPP Team
+Copyright (c) 2026 Django-ERP Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1056,16 +1056,16 @@ SOFTWARE.
 ## 🌐 Links
 
 - **Website**: [https://Django-ERP.com](https://Django-ERP.com)
-- **Documentation**: [https://docs.eerrpp.com](https://docs.Django-ERP.com)
-- **GitHub**: [https://github.com/AI-Advenced/EERRPP](https://github.com/AI-Advenced/Django-ERP)
-- **Demo**: [https://demo.eerrpp.com](https://demo.Django-ERP.com)
-- **Blog**: [https://blog.eerrpp.com](https://blog.Django-ERP.com)
+- **Documentation**: [https://docs.Django-ERP.com](https://docs.Django-ERP.com)
+- **GitHub**: [https://github.com/AI-Advenced/Django-ERP](https://github.com/AI-Advenced/Django-ERP)
+- **Demo**: [https://demo.Django-ERP.com](https://demo.Django-ERP.com)
+- **Blog**: [https://blog.Django-ERP.com](https://blog.Django-ERP.com)
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by the EERRPP Team**
+**Made with ❤️ by the Django-ERP Team**
 
 ⭐ **Star us on GitHub** if you find this project useful!
 
