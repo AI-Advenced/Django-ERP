@@ -1,1 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Django ERP System{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --info-color: #3B82F6;
+            --dark-bg: #111827;
+            --sidebar-bg: #1F2937;
+            --text-light: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border-color: #374151;
+            --hover-bg: #374151;
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1F2937;
+        }
+
+        /* Navbar Styles */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 76px;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            background: var(--dark-bg);
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--sidebar-bg);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: var(--hover-bg);
+            border-left-color: var(--primary-color);
+            color: white;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--hover-bg);
+            border-left-color: var(--primary-color);
+            color: white;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 76px;
+            padding: 2rem;
+            min-height: calc(100vh - 76px);
+        }
+
+        .content-wrapper {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            min-height: calc(100vh - 140px);
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            border: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            border: none;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            border: none;
+        }
+
+        /* Tables */
+        .table {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: #F9FAFB;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        /* Forms */
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #E5E7EB;
+            border-radius: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+        }
+
+        .stat-icon.danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Footer */
+        footer {
+            margin-left: 280px;
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #E5E7EB;
+            color: #6B7280;
+        }
+
+        @media (max-width: 991px) {
+            footer {
+                margin-left: 0;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-building"></i>
+                Django ERP System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+    <!-- Dashboard -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Dashboard</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/">
+                    <i class="fas fa-home"></i>
+                    <span>Main Dashboard</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- CRM -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">CRM</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'crm:lead_list' %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Leads</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'crm:contact_list' %}">
+                    <i class="fas fa-address-book"></i>
+                    <span>Contacts</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'crm:opportunity_list' %}">
+                    <i class="fas fa-handshake"></i>
+                    <span>Opportunities</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'crm:activity_list' %}">
+                    <i class="fas fa-tasks"></i>
+                    <span>Activities</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Sales -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Sales</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'sales:dashboard' %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Sales Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'sales:customer_list' %}">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'sales:order_list' %}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sales Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'sales:quotation_list' %}">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Quotations</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+<!-- Financial -->
+<div class="sidebar-section">
+    <div class="sidebar-title">Financial</div>
+    <ul class="sidebar-menu">
+        <li>
+            <a class="{% if request.path == '/financial/' %}active{% endif %}"
+               href="{% url 'financial:dashboard' %}">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'invoice' in request.path and 'financial' in request.path %}active{% endif %}"
+               href="{% url 'financial:invoice_list' %}">
+                <i class="fas fa-file-invoice"></i>
+                <span>Invoices</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'customer' in request.path and 'financial' in request.path %}active{% endif %}"
+               href="{% url 'financial:customer_list' %}">
+                <i class="fas fa-user-tie"></i>
+                <span>Customers</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'payment' in request.path and 'financial' in request.path %}active{% endif %}"
+               href="{% url 'financial:payment_list' %}">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Payments</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'bill' in request.path %}active{% endif %}"
+               href="{% url 'financial:bill_list' %}">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Bills</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'expense' in request.path %}active{% endif %}"
+               href="{% url 'financial:expense_list' %}">
+                <i class="fas fa-wallet"></i>
+                <span>Expenses</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'account' in request.path %}active{% endif %}"
+               href="{% url 'financial:account_list' %}">
+                <i class="fas fa-book"></i>
+                <span>Accounts</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'budget' in request.path %}active{% endif %}"
+               href="{% url 'financial:budget_list' %}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Budgets</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Fiscal -->
+<div class="sidebar-section">
+    <div class="sidebar-title">Fiscal</div>
+    <ul class="sidebar-menu">
+        <li>
+            <a class="{% if 'fiscal-year' in request.path %}active{% endif %}"
+               href="{% url 'fiscal:fiscalyear_list' %}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Fiscal Years</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'taxrate' in request.path %}active{% endif %}"
+               href="{% url 'fiscal:taxrate_list' %}">
+                <i class="fas fa-percent"></i>
+                <span>Tax Rates</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'invoice' in request.path and 'fiscal' in request.path %}active{% endif %}"
+               href="{% url 'fiscal:invoice_list' %}">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Fiscal Invoices</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'payment' in request.path and 'fiscal' in request.path %}active{% endif %}"
+               href="{% url 'fiscal:payment_list' %}">
+                <i class="fas fa-money-check-alt"></i>
+                <span>Fiscal Payments</span>
+            </a>
+        </li>
+        <li>
+            <a class="{% if 'tax-report' in request.path %}active{% endif %}"
+               href="{% url 'fiscal:taxreport_list' %}">
+                <i class="fas fa-file-alt"></i>
+                <span>Tax Reports</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+    <!-- Purchasing -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Purchasing & Procurement</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'purchasing:dashboard' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Purchasing Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'purchasing:supplier_list' %}">
+                    <i class="fas fa-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'purchasing:purchase_order_list' %}">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Purchase Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'purchasing:requisition_list' %}">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Requisitions</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'purchasing:rfq_list' %}">
+                    <i class="fas fa-comments-dollar"></i>
+                    <span>RFQs</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'purchasing:goods_receipt_list' %}">
+                    <i class="fas fa-dolly"></i>
+                    <span>Goods Receipts</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Inventory -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Inventory</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'inventory:product_list' %}">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inventory:category_list' %}">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inventory:warehouse_list' %}">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Warehouses</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inventory:movement_list' %}">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Stock Movements</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Logistics -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Logistics & Supply Chain</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'logistics:dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Logistics Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:warehouse_list' %}">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Warehouses</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:inventory_list' %}">
+                    <i class="fas fa-boxes"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:shipment_list' %}">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Shipments</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:route_list' %}">
+                    <i class="fas fa-route"></i>
+                    <span>Routes</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:delivery_list' %}">
+                    <i class="fas fa-dolly"></i>
+                    <span>Deliveries</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logistics:stock_movement_list' %}">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Stock Movements</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Human Resources -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Human Resources</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'hr:dashboard' %}">
+                    <i class="fas fa-users"></i>
+                    <span>HR Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'hr:employee_list' %}">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Employees</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'hr:department_list' %}">
+                    <i class="fas fa-building"></i>
+                    <span>Departments</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'hr:attendance_list' %}">
+                    <i class="fas fa-clock"></i>
+                    <span>Attendance</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'hr:leave_request_list' %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'hr:payroll_list' %}">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Payroll</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Projects -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Project Management</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'projects:dashboard' %}">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'projects:project_list' %}">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'projects:task_list' %}">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'projects:milestone_list' %}">
+                    <i class="fas fa-flag-checkered"></i>
+                    <span>Milestones</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'projects:timeentry_list' %}">
+                    <i class="fas fa-stopwatch"></i>
+                    <span>Time Tracking</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Quality Management -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Quality Management</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'quality:dashboard' %}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Quality Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'quality:inspection_list' %}">
+                    <i class="fas fa-microscope"></i>
+                    <span>Inspections</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'quality:nonconformance_list' %}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Non-Conformance</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'quality:capa_list' %}">
+                    <i class="fas fa-tools"></i>
+                    <span>Corrective Actions (CAPA)</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Maintenance & Asset Management -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">Maintenance & Assets</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'maintenance:dashboard' %}">
+                    <i class="fas fa-tools"></i>
+                    <span>Maintenance Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance:asset_list' %}">
+                    <i class="fas fa-cogs"></i>
+                    <span>Assets & Equipment</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance:pm_list' %}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Preventive Maintenance</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance:workorder_list' %}">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Work Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'maintenance:log_list' %}">
+                    <i class="fas fa-history"></i>
+                    <span>Maintenance Logs</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Business Intelligence & Reporting -->
+    <div class="sidebar-section">
+        <div class="sidebar-title">BI & Analytics</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'bi_reporting:analytics_dashboard' %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'bi_reporting:dashboard_list' %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboards</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'bi_reporting:kpi_list' %}">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>KPIs</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'bi_reporting:report_list' %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'bi_reporting:datasource_list' %}">
+                    <i class="fas fa-database"></i>
+                    <span>Data Sources</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Administration -->
+    {% if user.is_staff %}
+    <div class="sidebar-section">
+        <div class="sidebar-title">System</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/admin/">
+                    <i class="fas fa-cog"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+</aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Page Content -->
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2026 Django ERP System. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Version 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Highlight active menu item
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const menuLinks = document.querySelectorAll('.sidebar-menu a');
+            
+            menuLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile sidebar toggle
+        const sidebarToggle = document.querySelector('.navbar-toggler');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
