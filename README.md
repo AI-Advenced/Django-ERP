@@ -15,6 +15,10 @@
 
 </div>
 
+Thanks for thiagopena/djangoSIGE
+Sistema Integrado de Gestão Empresarial baseado em Django
+https://github.com/thiagopena/djangoSIGE
+
 ---
 
 ## 📋 Table of Contents
